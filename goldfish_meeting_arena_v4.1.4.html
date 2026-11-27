@@ -1,0 +1,3234 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Goldfish Meeting Arena — Rin × Eve | Muna ↔ Project Owner</title>
+  <style>
+    /* ===== 1. ตัวแปรสีและฟอนต์แบบมินิมอล (0 ไลบรารีภายนอก) ===== */
+    :root {
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --border: #e5e5e5;
+      --text: #171717;
+      --muted: #5c5c5c;
+      --rin: #0f766e;
+      --rin-bg: #f0fdfa;
+      --eve: #4338ca;
+      --eve-bg: #eef2ff;
+      --muna: #b45309;
+      --muna-bg: #fffbeb;
+      --owner: #171717;
+      --owner-bg: #f5f5f5;
+      --radius: 8px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Thai", sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    summary:focus-visible {
+      outline: 2px solid var(--text);
+      outline-offset: 2px;
+    }
+
+    /* ===== 2. แถบหัวด้านบน ===== */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .brand h1 {
+      font-size: 15px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .badge {
+      font-size: 11px;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 2px 7px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .save-dot {
+      font-size: 11px;
+      color: var(--rin);
+      white-space: nowrap;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .mode-badge {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .mode-badge.bridge { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .mode-badge.demo   { background: #fef9c3; color: #854d0e; border: 1px solid #fde68a; }
+
+    .mode-switch {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .mode-switch button {
+      border: none;
+      border-radius: 0;
+      padding: 5px 10px;
+      font-size: 12px;
+      background: transparent;
+      color: var(--muted);
+    }
+
+    .mode-switch button.active {
+      background: var(--text);
+      color: #ffffff;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 13px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      padding: 6px 11px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+
+    button:hover:not(:disabled) {
+      background: #f5f5f5;
+      border-color: #d4d4d4;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    button.primary {
+      background: var(--text);
+      color: #ffffff;
+      border-color: var(--text);
+    }
+
+    button.primary:hover:not(:disabled) {
+      background: #333333;
+    }
+
+    button.muna-btn {
+      background: var(--muna);
+      color: #ffffff;
+      border-color: var(--muna);
+    }
+
+    button.muna-btn:hover:not(:disabled) {
+      background: #92400e;
+    }
+
+    /* แถบแสดงลำดับคิวการประชุม (Discussion Lead Hub-and-Spoke) */
+    .flow-bar {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 6px 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      flex-shrink: 0;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+
+    .flow-step {
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      white-space: nowrap;
+    }
+
+    .flow-step.active {
+      background: var(--muna);
+      color: #ffffff;
+      border-color: var(--muna);
+      font-weight: 600;
+    }
+
+    .flow-step.active-rin {
+      background: var(--rin);
+      color: #ffffff;
+      border-color: var(--rin);
+      font-weight: 600;
+    }
+
+    .flow-step.active-eve {
+      background: var(--eve);
+      color: #ffffff;
+      border-color: var(--eve);
+      font-weight: 600;
+    }
+
+    .flow-arrow { color: #a3a3a3; user-select: none; }
+
+    .msg.handoff {
+      border-left: 3px solid var(--muted);
+      background: #f5f5f5;
+      font-size: 13px;
+    }
+
+    .bridge-wait-note {
+      border-top: 1px solid var(--border);
+      background: #fffbeb;
+      color: #92400e;
+      padding: 9px 16px;
+      font-size: 12.5px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .bridge-wait-note.show { display: flex; }
+
+    /* แท็บสลับหน้าจอสำหรับมือถือ */
+    .mobile-tabs {
+      display: none;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 6px 12px;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .mobile-tabs button {
+      flex: 1;
+      text-align: center;
+    }
+
+    .mobile-tabs button.active {
+      background: var(--text);
+      color: #ffffff;
+      border-color: var(--text);
+    }
+
+    /* ===== 3. โครงสร้าง 2 คอลัมน์ (ซ้าย: Rin×Eve | ขวา: Muna↔Project Owner) ===== */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 0;
+    }
+
+    .pane {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background: var(--surface);
+    }
+
+    .pane-left {
+      border-right: 1px solid var(--border);
+    }
+
+    .pane-header {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+
+    .pane-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+
+    .pane-status {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* แถบตัวตนผู้เข้าร่วมประชุม */
+    .personas {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+
+    .pill-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .pill {
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-weight: 500;
+      border: 1px solid transparent;
+    }
+
+    .pill.rin   { color: var(--rin);   background: var(--rin-bg);   cursor: pointer; }
+    .pill.eve   { color: var(--eve);   background: var(--eve-bg);   cursor: pointer; }
+    .pill.muna  { color: var(--muna);  background: var(--muna-bg);  cursor: default; }
+    .pill.owner { color: var(--owner); background: var(--owner-bg); cursor: default; }
+
+    .pill.current.rin { border-color: var(--rin); }
+    .pill.current.eve { border-color: var(--eve); }
+
+    /* พื้นที่ข้อความแชท */
+    .chat-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 0;
+    }
+
+    .empty-state {
+      margin: auto;
+      text-align: center;
+      max-width: 380px;
+      color: var(--muted);
+    }
+
+    .empty-state p {
+      margin-bottom: 12px;
+    }
+
+    .guiding-quote {
+      font-size: 12px;
+      font-style: italic;
+      color: var(--muted);
+      border-left: 2px solid var(--border);
+      padding-left: 10px;
+      text-align: left;
+      margin: 0 auto 14px;
+      max-width: 320px;
+    }
+
+    .sample-topics {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .sample-topics button {
+      font-size: 12px;
+      padding: 4px 10px;
+      color: var(--muted);
+    }
+
+    .msg {
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .msg.rin   { border-left: 3px solid var(--rin);   background: var(--rin-bg); }
+    .msg.eve   { border-left: 3px solid var(--eve);   background: var(--eve-bg); }
+    .msg.muna  { border-left: 3px solid var(--muna);  background: var(--muna-bg); }
+    .msg.owner { border-left: 3px solid var(--owner); background: var(--owner-bg); }
+    .msg.directive {
+      border-left: 3px solid var(--muna);
+      background: #fef9c3;
+      border-color: #fde68a;
+    }
+
+    .msg-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+      font-size: 12px;
+      white-space: normal;
+      gap: 8px;
+    }
+
+    .msg-author { font-weight: 600; }
+    .msg.rin .msg-author  { color: var(--rin); }
+    .msg.eve .msg-author  { color: var(--eve); }
+    .msg.muna .msg-author,
+    .msg.directive .msg-author { color: var(--muna); }
+
+    .msg-round { color: var(--muted); font-size: 11px; }
+
+    .msg-footer {
+      margin-top: 8px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .msg-footer button {
+      font-size: 11.5px;
+      padding: 3px 9px;
+      color: var(--muna);
+      border-color: #f59e0b;
+      background: var(--surface);
+    }
+
+    .msg-footer button:hover { background: #fef3c7; }
+
+    .btn-copy-msg {
+      font-size: 11.5px;
+      padding: 3px 9px;
+      color: var(--muted) !important;
+      border-color: var(--border) !important;
+      background: var(--surface) !important;
+    }
+    .btn-copy-msg:hover { background: #f5f5f5 !important; }
+    .btn-copy-msg.copied {
+      color: var(--rin) !important;
+      border-color: var(--rin) !important;
+    }
+
+    /* ===== การ์ดสะพานคัดลอก ===== */
+    .bridge-panel {
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      padding: 10px 16px;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .bridge-panel.show { display: flex; }
+
+    .bridge-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .bridge-turn-label {
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+    .bridge-turn-label.rin  { color: var(--rin); }
+    .bridge-turn-label.eve  { color: var(--eve); }
+    .bridge-turn-label.muna { color: var(--muna); }
+
+    .bridge-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .bridge-actions button {
+      font-size: 12px;
+      padding: 4px 10px;
+    }
+
+    .token-est {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+    }
+
+    .prompt-preview {
+      display: none;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: var(--muted);
+      max-height: 115px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    .prompt-preview.open { display: block; }
+
+    .bridge-paste-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .bridge-paste-row textarea {
+      flex: 1;
+      min-width: 0;
+      min-height: 52px;
+      max-height: 110px;
+      resize: vertical;
+      font-family: inherit;
+      font-size: 13px;
+      line-height: 1.5;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+    }
+
+    .bridge-paste-row textarea:focus {
+      border-color: var(--text);
+      background: var(--surface);
+    }
+
+    /* ช่องพิมพ์ด้านล่างแต่ละฝั่ง */
+    .chat-controls {
+      border-top: 1px solid var(--border);
+      padding: 10px 16px;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .input-row input {
+      flex: 1;
+      min-width: 0;
+      font-family: inherit;
+      font-size: 14px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--text);
+      outline: none;
+    }
+
+    .input-row input:focus {
+      border-color: var(--text);
+    }
+
+    .control-subrow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+
+    .quick-muna-btns {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .quick-muna-btns button {
+      font-size: 11.5px;
+      padding: 3px 9px;
+      color: var(--muted);
+    }
+
+    /* ===== Task List Panel ===== */
+    .task-panel {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(560px, calc(100vw - 32px));
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+      z-index: 20;
+      display: none;
+      flex-direction: column;
+      max-height: 60dvh;
+      overflow: hidden;
+    }
+    .task-panel.open { display: flex; }
+
+    .task-panel-header {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+    .task-panel-header h3 { font-size: 13px; font-weight: 600; }
+
+    .task-panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      font-size: 13px;
+    }
+    .task-item.done { opacity: 0.55; }
+    .task-item.done .task-text { text-decoration: line-through; }
+
+    .task-check {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      cursor: pointer;
+      accent-color: var(--rin);
+    }
+    .task-text { flex: 1; word-break: break-word; }
+    .task-del {
+      font-size: 11px;
+      padding: 1px 6px;
+      color: var(--muted);
+      border-color: transparent;
+      background: transparent;
+    }
+    .task-del:hover { color: #ef4444; border-color: #fca5a5; background: #fff1f2; }
+
+    .task-panel-footer {
+      padding: 8px 14px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .task-panel-footer input {
+      flex: 1;
+      font-family: inherit;
+      font-size: 13px;
+      padding: 6px 9px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      outline: none;
+      background: var(--surface);
+      color: var(--text);
+    }
+    .task-panel-footer input:focus { border-color: var(--text); }
+
+    /* ===== 4. Modal ตั้งค่าบทบาท & Export ===== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(23, 23, 23, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 30;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      width: 100%;
+      max-width: 680px;
+      max-height: 88dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .export-modal { max-width: 460px; }
+
+    .modal-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
+    }
+
+    .modal-header h2 {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .modal-body {
+      padding: 14px 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .prompt-field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .prompt-field label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .prompt-field textarea {
+      width: 100%;
+      min-height: 76px;
+      resize: vertical;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.5;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+    }
+
+    .prompt-field textarea:focus {
+      border-color: var(--text);
+      background: var(--surface);
+    }
+
+    .modal-footer {
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .backup-section {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .backup-section small { color: var(--muted); font-size: 12px; }
+    .backup-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .backup-row[hidden] { display: none; }
+    .backup-row select {
+      flex: 1;
+      min-width: 0;
+      font-family: inherit;
+      font-size: 12px;
+      padding: 5px 6px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .export-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .export-option input {
+      margin-top: 3px;
+      accent-color: var(--text);
+      cursor: pointer;
+    }
+
+    .export-option small {
+      display: block;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+
+    .export-meta-summary {
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-family: var(--font-mono);
+    }
+
+    .export-preview-details {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      background: var(--bg);
+    }
+
+    .export-preview-details summary {
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .export-preview-pre {
+      margin-top: 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.45;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px;
+      overflow-x: auto;
+      max-height: 180px;
+      white-space: pre;
+    }
+
+    /* Toast แจ้งเตือนเล็กๆ มุมขวาล่าง */
+    .toast {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      background: var(--text);
+      color: #ffffff;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 40;
+    }
+    .toast.show { opacity: 1; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
+
+    /* รองรับหน้าจอมือถือ / จอแคบ */
+    @media (max-width: 860px) {
+      .mobile-tabs { display: flex; }
+      main { grid-template-columns: 1fr; }
+      .pane-left { border-right: none; }
+      .pane.hidden-mobile { display: none; }
+      .badge, .save-dot { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- ส่วนหัว -->
+  <header>
+    <div class="brand">
+      <h1>Goldfish Meeting Arena</h1>
+      <span id="versionBadge" class="badge">v4.1.4 · Lead-First</span>
+      <span id="saveIndicator" class="save-dot" aria-live="polite">● บันทึกอัตโนมัติ</span>
+    </div>
+    <div class="header-actions">
+      <span id="modeBadge" class="mode-badge bridge" aria-live="polite">🔗 Bridge 0฿</span>
+      <div class="mode-switch" role="group" aria-label="เลือกโหมดการทำงาน">
+        <button id="btnModeBridge" class="active" type="button" aria-pressed="true">สะพานคัดลอก (0฿)</button>
+        <button id="btnModeDemo" type="button" aria-pressed="false">โหมดจำลอง</button>
+      </div>
+      <button id="btnTaskPanel" type="button" aria-expanded="false" aria-controls="taskPanel" aria-label="รายการงาน">📋 งาน</button>
+      <button id="btnOpenPrompts" type="button" aria-haspopup="dialog" aria-controls="promptModal">กติกา &amp; บทบาท</button>
+      <button id="btnDownloadMd" type="button" aria-haspopup="dialog" aria-controls="exportModal" title="ส่งออก .md (Ctrl+Shift+E)">ส่งออก .md</button>
+      <button id="btnReset" type="button">เริ่มใหม่</button>
+    </div>
+  </header>
+
+  <!-- แถบขั้นตอนการประชุมแบบผ่าน Discussion Lead (Muna) ทุกครั้ง -->
+  <div id="flowBar" class="flow-bar" aria-label="ลำดับขั้นตอนการประชุมผ่าน Discussion Lead">
+    <span style="font-weight:600;color:var(--text);">กติกาการไหลข้อมูล:</span>
+    <span id="stepLeadOpen" class="flow-step">1. Muna เปิดกรอบ</span>
+    <span class="flow-arrow">→</span>
+    <span id="stepRin" class="flow-step">2. Rin ส่งให้ Muna</span>
+    <span class="flow-arrow">→</span>
+    <span id="stepLeadRin" class="flow-step">3. Muna ส่งต่อ Eve</span>
+    <span class="flow-arrow">→</span>
+    <span id="stepEve" class="flow-step">4. Eve ส่งให้ Muna</span>
+    <span class="flow-arrow">→</span>
+    <span id="stepLeadSynth" class="flow-step">5. Muna สรุปเสนอ Owner</span>
+  </div>
+
+  <!-- แท็บสลับฝั่งบนจอมือถือ -->
+  <div class="mobile-tabs" role="tablist" aria-label="สลับห้องประชุม">
+    <button id="tabTeam" class="active" type="button" role="tab" aria-selected="true" aria-controls="paneTeam">ห้องวิเคราะห์ (Rin × Eve)</button>
+    <button id="tabMuna" type="button" role="tab" aria-selected="false" aria-controls="paneMuna">ห้องสังเคราะห์ (Muna ↔ Owner)</button>
+  </div>
+
+  <!-- พื้นที่หลัก 2 ฝั่ง -->
+  <main>
+    <!-- ===== ฝั่งซ้าย: ห้องวิเคราะห์และทบทวน (Rin × Eve) ===== -->
+    <section id="paneTeam" class="pane pane-left" aria-label="ห้องหารือระหว่าง Rin และ Eve">
+      <div class="pane-header">
+        <span class="pane-title">ห้องหารือ · Rin × Eve</span>
+        <span id="teamStatus" class="pane-status" aria-live="polite">โหมดสะพานคัดลอก · พร้อมทำงาน</span>
+      </div>
+
+      <div class="personas">
+        <div class="pill-group" role="group" aria-label="เลือกคิวผู้พูดในฝั่งซ้าย" title="คลิกเพื่อเลือกคิวผู้พูดระหว่าง Rin และ Eve">
+          <button type="button" class="pill rin current" data-turn="0" aria-pressed="true">Rin (ริน) · Operational Analyst</button>
+          <button type="button" class="pill eve" data-turn="1" aria-pressed="false">Eve (อีฟ) · Structural Reviewer</button>
+        </div>
+        <span id="teamRoundInfo" style="font-size:12px;color:var(--muted);">ยังไม่เริ่มรอบ</span>
+      </div>
+
+      <div id="teamChatList" class="chat-list" role="log" aria-label="ข้อความในห้อง Rin และ Eve">
+        <div id="teamEmpty" class="empty-state">
+          <div class="guiding-quote">"Clean up what we have before scaling what we build." — Build the world, not the bureaucracy.</div>
+          <p>ทุกฝ่ายต้องส่งคำตอบผ่าน <strong>Muna (Discussion Lead)</strong> ก่อนทุกครั้ง — พิมพ์ประเด็นหารือด้านล่างเพื่อให้ Muna เปิดกรอบส่งให้ <strong>Rin</strong> และ <strong>Eve</strong> ตามลำดับ</p>
+          <div class="sample-topics">
+            <button type="button" class="sample-btn" data-topic="วางแผนโครงสร้างและสคริปต์ Normalize สำหรับ Jawi Corpus">โครงสร้าง Jawi Corpus</button>
+            <button type="button" class="sample-btn" data-topic="ทบทวน Workflow การจัดการเอกสารและ Tasks ของ Goldfish Project">ทบทวน Workflow Goldfish</button>
+            <button type="button" class="sample-btn" data-topic="กำหนดขอบเขต Phase 3 ของแอปประชุมให้เบาและไม่สร้าง Layer เกินจำเป็น">ขอบเขต Phase 3 แอปประชุม</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- แจ้งเตือนเมื่อคิวอยู่ที่ Muna (Discussion Lead) -->
+      <div id="teamWaitNote" class="bridge-wait-note" role="status" aria-live="polite">
+        <span id="teamWaitText">⏳ ส่งคำตอบให้ Muna (Discussion Lead) แล้ว — รอ Muna ตรวจรับและส่งกรอบต่อที่ฝั่งขวา</span>
+      </div>
+
+      <!-- สะพานคัดลอกฝั่งซ้าย (Rin / Eve) -->
+      <div id="teamBridgePanel" class="bridge-panel" aria-label="สะพานคัดลอกพรอมต์ห้อง Rin และ Eve">
+        <div class="bridge-top">
+          <span id="teamTurnLabel" class="bridge-turn-label rin">คิวถัดไป: Rin (ริน) · Operational Analyst (รอบที่ 1)</span>
+          <div class="bridge-actions">
+            <span id="teamTokenEst" class="token-est" title="ประมาณการ Token สำหรับภาษาไทยและอังกฤษ"></span>
+            <button id="btnToggleTeamPrompt" type="button" aria-expanded="false" aria-controls="teamPromptPreview">ดูพรอมต์</button>
+            <button id="btnCopyTeamPrompt" class="primary" type="button">คัดลอกพรอมต์ → Rin</button>
+          </div>
+        </div>
+        <pre id="teamPromptPreview" class="prompt-preview"></pre>
+        <div class="bridge-paste-row">
+          <textarea id="teamReplyInput" aria-label="วางคำตอบจาก Rin หรือ Eve" placeholder="วางคำตอบจาก Rin (ริน) ที่นี่... (Ctrl+Enter เพื่อบันทึก)"></textarea>
+          <button id="btnSaveTeamReply" class="primary" type="button">บันทึกคำตอบ</button>
+        </div>
+      </div>
+
+      <div class="chat-controls">
+        <form id="topicForm" class="input-row">
+          <input id="topicInput" type="text" aria-label="ตั้งประเด็นหารือหรือแทรกข้อมูลหน้างานให้ Rin และ Eve" placeholder="ตั้งประเด็นหารือ หรือแทรกข้อมูลหลักฐานให้ Rin &amp; Eve..." autocomplete="off" />
+          <button id="btnSendTopic" class="primary" type="submit">เปิดประเด็นหารือ</button>
+        </form>
+        <div class="control-subrow">
+          <span id="topicDisplay">ยังไม่ได้ตั้งประเด็นหารือ</span>
+          <button id="btnTeamNext" type="button" disabled>สลับไปอีกฝั่ง</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ฝั่งขวา: ห้องดำเนินการประชุมและสังเคราะห์ (Muna ↔ Project Owner) ===== -->
+    <section id="paneMuna" class="pane hidden-mobile" aria-label="ห้องสังเคราะห์ระหว่าง Muna และ Project Owner">
+      <div class="pane-header">
+        <span class="pane-title">ห้องสังเคราะห์และคุมขอบเขต · Muna ↔ Project Owner</span>
+        <span id="munaStatus" class="pane-status" aria-live="polite">พร้อมประสานงานกับ Project Owner</span>
+      </div>
+
+      <div class="personas">
+        <div class="pill-group">
+          <span class="pill muna">Muna (มูนา) · Discussion Lead &amp; Synthesizer</span>
+          <span class="pill owner">Project Owner (คุณ)</span>
+        </div>
+        <span id="syncCount" style="font-size:12px;color:var(--muted);">เห็นแชทฝั่งซ้าย 0 ข้อความ</span>
+      </div>
+
+      <div id="munaChatList" class="chat-list" role="log" aria-label="ข้อความระหว่าง Project Owner และ Muna">
+        <div id="munaEmpty" class="empty-state">
+          <p>ช่องนี้คือแชทตรงระหว่าง <strong>Project Owner (คุณ)</strong> กับ <strong>Muna (มูนา)</strong> โดย Muna จะมองเห็นบทสนทนาของ Rin และ Eve จากฝั่งซ้ายทั้งหมด เพื่อสังเคราะห์สรุป 7 หัวข้อตามกติกา Goldfish Project และส่งกรอบประเด็นกลับไปคุมขอบเขตได้ทันที</p>
+        </div>
+      </div>
+
+      <!-- แจ้งเตือนสถานะฝั่งขวา (รอ Rin/Eve หรือรอ Project Owner) -->
+      <div id="munaWaitNote" class="bridge-wait-note" role="status" aria-live="polite">
+        <span id="munaWaitText">⏳ รอ Project Owner ตัดสินใจหรือสั่งการ</span>
+      </div>
+
+      <!-- สะพานคัดลอกฝั่งขวา (Muna) -->
+      <div id="munaBridgePanel" class="bridge-panel" aria-label="สะพานคัดลอกพรอมต์สำหรับ Muna">
+        <div class="bridge-top">
+          <span id="munaTurnLabel" class="bridge-turn-label muna">พรอมต์สำหรับ Muna (Discussion Lead)</span>
+          <div class="bridge-actions">
+            <span id="munaTokenEst" class="token-est" title="ประมาณการ Token สำหรับภาษาไทยและอังกฤษ"></span>
+            <button id="btnToggleMunaPrompt" type="button" aria-expanded="false" aria-controls="munaPromptPreview">ดูพรอมต์</button>
+            <button id="btnCopyMunaPrompt" class="muna-btn" type="button">คัดลอกพรอมต์ → Muna</button>
+          </div>
+        </div>
+        <pre id="munaPromptPreview" class="prompt-preview"></pre>
+        <div class="bridge-paste-row">
+          <textarea id="munaReplyInput" aria-label="วางคำสังเคราะห์จาก Muna" placeholder="วางบทสรุปหรือข้อเสนอจาก Muna (มูนา) ที่นี่... (Ctrl+Enter เพื่อบันทึก)"></textarea>
+          <button id="btnSaveMunaReply" class="muna-btn" type="button">บันทึกคำตอบ Muna</button>
+        </div>
+      </div>
+
+      <div class="chat-controls">
+        <form id="munaForm" class="input-row">
+          <input id="munaInput" type="text" aria-label="ข้อความถึง Muna" placeholder="คุยกับ Muna เช่น 'สังเคราะห์รอบนี้ให้หน่อย' หรือ 'มีจุดไหนที่ต้องใช้ Owner Decision?'" autocomplete="off" />
+          <button id="btnSendMuna" class="muna-btn" type="submit">ส่งให้ Muna</button>
+        </form>
+        <div class="control-subrow">
+          <div class="quick-muna-btns">
+            <button type="button" class="muna-quick-btn" data-prompt="ช่วยสังเคราะห์บทสนทนาล่าสุดระหว่าง Rin กับ Eve ตามโครงสร้าง Meeting Output 7 หัวข้อ">สังเคราะห์ 7 หัวข้อ</button>
+            <button type="button" class="muna-quick-btn" data-prompt="ช่วยกำหนดกรอบประเด็นและคุม Scope สำหรับส่งกลับไปให้ Rin และ Eve หารือต่อในรอบถัดไป">คุมกรอบรอบถัดไป</button>
+            <button type="button" class="muna-quick-btn" data-prompt="ช่วยแยกจุดเห็นต่าง ข้อจำกัด และประเด็นที่ต้องใช้ Required Owner Decisions ออกมาให้ชัดเจน">แยกประเด็นรอ Owner</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal ตั้งค่ากติกาและบทบาท Goldfish Project -->
+  <div id="promptModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="promptModalTitle">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="promptModalTitle">กติกาการประชุมและบทบาท — Goldfish Project</h2>
+        <button id="btnClosePrompts" type="button" aria-label="ปิดหน้าต่างกติกาและบทบาท">ปิด</button>
+      </div>
+      <div class="modal-body">
+        <div class="prompt-field">
+          <label for="inputMeetingRules">Meeting Rules &amp; Guiding Principle (บังคับใช้กับทุกคน — ห้ามสร้าง Consensus เทียม)</label>
+          <textarea id="inputMeetingRules"></textarea>
+        </div>
+        <div class="prompt-field">
+          <label for="inputPromptRin" style="color:var(--rin);">1. Rin (ริน) — Operational Analyst</label>
+          <textarea id="inputPromptRin"></textarea>
+        </div>
+        <div class="prompt-field">
+          <label for="inputPromptEve" style="color:var(--eve);">2. Eve (อีฟ) — Structural Reviewer &amp; Improvement Architect</label>
+          <textarea id="inputPromptEve"></textarea>
+        </div>
+        <div class="prompt-field">
+          <label for="inputPromptMuna" style="color:var(--muna);">3. Muna (มูนา) — Discussion Lead &amp; Solution Synthesizer</label>
+          <textarea id="inputPromptMuna"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btnResetPrompts" type="button">คืนค่าเริ่มต้น</button>
+        <button id="btnSavePrompts" class="primary" type="button">บันทึกกติกา &amp; บทบาท</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task List Panel -->
+  <div id="taskPanel" class="task-panel" role="dialog" aria-modal="true" aria-labelledby="taskPanelTitle">
+    <div class="task-panel-header">
+      <h3 id="taskPanelTitle">📋 รายการงาน / Owner Decisions <span id="taskCount" style="font-weight:400;color:var(--muted);font-size:12px;"></span></h3>
+      <div style="display:flex;gap:6px;">
+        <button id="btnClearDone" type="button" style="font-size:12px;padding:3px 9px;color:var(--muted);">ลบที่เสร็จ</button>
+        <button id="btnCloseTask" type="button" aria-label="ปิดรายการงาน">ปิด</button>
+      </div>
+    </div>
+    <div id="taskList" class="task-panel-body">
+      <p style="color:var(--muted);font-size:13px;text-align:center;margin:auto;">ยังไม่มีงาน — เพิ่มด้านล่าง</p>
+    </div>
+    <div class="task-panel-footer">
+      <input id="taskInput" type="text" aria-label="เพิ่มงานใหม่" placeholder="เพิ่ม Action Item หรือ Owner Decision..." autocomplete="off" />
+      <button id="btnAddTask" class="primary" type="button">เพิ่ม</button>
+    </div>
+  </div>
+
+  <!-- Export Options Modal -->
+  <div id="exportModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="exportModalTitle">
+    <div class="modal export-modal">
+      <div class="modal-header">
+        <h2 id="exportModalTitle">ส่งออกและสำรองข้อมูล Goldfish</h2>
+        <button id="btnCloseExport" type="button" aria-label="ปิดหน้าต่างส่งออก">ปิด</button>
+      </div>
+      <div class="modal-body">
+        <div id="exportMetaSummary" class="export-meta-summary" role="status" aria-live="polite"></div>
+        <label class="export-option">
+          <input id="chkExportExtras" type="checkbox" checked />
+          <span>
+            <strong>รวมรายการงาน (Tasks) และสรุปบริบท</strong>
+            <small>แนบเช็กลิสต์งานและสรุปข้อความเก่า (ถ้ามี)</small>
+          </span>
+        </label>
+        <label class="export-option">
+          <input id="chkExportPrompts" type="checkbox" />
+          <span>
+            <strong>รวม Meeting Rules และบทบาททั้ง 3 คน</strong>
+            <small>ปิดไว้เป็นค่าเริ่มต้นเพื่อไม่ให้ไฟล์บันทึกยาวเกินจำเป็น</small>
+          </span>
+        </label>
+        <details id="exportPreviewDetails" class="export-preview-details" aria-expanded="false">
+          <summary>ดูตัวอย่างไฟล์ (10 บรรทัดแรก)</summary>
+          <pre id="exportPreviewMd" class="export-preview-pre"></pre>
+        </details>
+        <div class="backup-section">
+          <strong>สำรอง / กู้คืนทั้งแอป (JSON)</strong>
+          <small>ต่างจาก .md ตรงที่เก็บครบทั้งสองห้อง งาน กติกา และบทบาท จึงนำกลับมาใช้ต่อได้</small>
+          <div class="backup-row">
+            <button id="btnBackupJson" type="button">ดาวน์โหลดสำรอง (.json)</button>
+            <button id="btnRestoreJson" type="button">กู้คืนจากไฟล์…</button>
+            <input id="inputRestoreJson" type="file" accept=".json,application/json" hidden />
+          </div>
+          <div id="autoBackupRow" class="backup-row" hidden>
+            <select id="selectAutoBackup" aria-label="เลือกชุดสำรองอัตโนมัติ"></select>
+            <button id="btnRestoreAutoBackup" type="button">กู้คืนชุดนี้</button>
+          </div>
+          <small>ชุดสำรองอัตโนมัติสร้างเมื่ออ่านข้อมูลเดิมไม่ได้ หรือก่อนกู้คืนทับของเดิม (เก็บล่าสุด 3 ชุด)</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btnCopyExportMd" type="button">คัดลอก .md</button>
+        <button id="btnConfirmDownloadMd" class="primary" type="button">ดาวน์โหลด .md</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    // ===== 1. ค่าตั้งต้น Goldfish Project — Participants, Meeting Rules & Guiding Principle =====
+    const APP_VERSION = 'v4.1.4 · Lead-First';
+    const STORAGE_KEY = 'goldfish_meeting_arena_v1';
+    const SCHEMA_VERSION = 1;
+
+    const CTX = {
+      TEAM_WINDOW: 8,
+      TEAM_SUMMARIZE_AT: 12,
+      MUNA_TEAM_WINDOW: 10,
+      MUNA_SELF_WINDOW: 4
+    };
+
+    const DEFAULT_PROMPTS = {
+      meetingRules:
+        'Meeting Rules — Goldfish Project (บังคับเคร่งครัด):\n' +
+        '0. Muna (Discussion Lead) เป็นผู้ดำเนินการประชุม ทุกฝ่าย (Rin, Eve) ต้องส่งคำตอบและข้อเสนอให้ Muna ตรวจรับและคุมประเด็นก่อนทุกครั้ง ห้ามส่งข้ามหรือสรุปมติกันเอง\n' +
+        '1. Project Owner เป็นผู้มีอำนาจตัดสินใจขั้นสุดท้ายในทุกเรื่องที่สงวนอำนาจไว้ ผู้เข้าร่วมไม่มีสิทธิ์อนุมัติหรือเปลี่ยนนโยบายแทน Owner\n' +
+        '2. แสดงความเห็น วิจารณ์ และโต้แย้งได้อย่างอิสระบนฐานเหตุผลและหลักฐาน — ห้ามสร้าง Consensus เทียม หากเห็นต่างให้บันทึกเหตุผลของแต่ละฝ่าย\n' +
+        '3. แยก Fact, Analysis, Proposal, Risk และ Owner Decision ให้ชัดเจน ห้ามขึ้นต้นด้วยคำชมลอยๆ หรือทวนคำพูดเดิมซ้ำ\n' +
+        '4. ห้ามเปลี่ยนแปลง Notion, GitHub, Tasks DB หรือเอกสารจริงจากการหารือ เว้นแต่ได้รับอนุญาตตามขอบเขตอำนาจ\n' +
+        '5. Guiding Principle: "Clean up what we have before scaling what we build." — Build the world, not the bureaucracy.',
+      rin:
+        'คุณคือ "Rin (ริน)" — Operational Analyst (Senior Engineering Collaborator) ใน Goldfish Project\n' +
+        'บุคลิก: รอบคอบ ตรงไปตรงมา ให้ความสำคัญกับหลักฐาน ความถูกต้อง และความเป็นไปได้ในการทำงานจริง\n' +
+        'หน้าที่และลักษณะการตอบ:\n' +
+        '- วิเคราะห์ปัญหาจากการปฏิบัติงานจริง ตรวจสอบข้อมูล เอกสาร Git, Commit, PR, Metadata และ Work Log\n' +
+        '- ใช้หลักฐานและข้อเท็จจริงเป็นฐาน ไม่คาดเดา ระบุสิ่งที่ตรวจแล้ว สิ่งที่ยังไม่ได้ตรวจ และข้อจำกัดอย่างตรงไปตรงมา\n' +
+        '- ไม่อ้างว่าดำเนินการแล้วหากยังไม่ได้ทำจริง กล้ารายงานเมื่อแนวทางที่เสนอทำไม่ได้ในทางปฏิบัติ\n' +
+        '- ประเมินผลกระทบและต้นทุน เสนอขั้นตอนปฏิบัติที่ตรวจสอบผลได้เรียงตามลำดับความสำคัญ และแยก Operational Task, Correction และ Owner Decision ให้ชัด\n' +
+        '- ส่งคำตอบทั้งหมดถึง Muna (Discussion Lead) เพื่อนำไปประสานและส่งต่อให้ Eve หรือ Project Owner',
+      eve:
+        'คุณคือ "Eve (อีฟ)" — Structural Reviewer & Improvement Architect ใน Goldfish Project\n' +
+        'บุคลิก: คิดเชิงวิพากษ์ เป็นอิสระ รอบคอบ ให้ความสำคัญกับความสอดคล้องของสถาปัตยกรรมระยะยาว\n' +
+        'หน้าที่และลักษณะการตอบ:\n' +
+        '- ตรวจสอบ Architecture, Workflow, Rules, Roles, Data Model และความสอดคล้องของเอกสาร\n' +
+        '- วิเคราะห์ Root Cause, Structural Defects, Risks และ Design Gaps พร้อมแยก Structural Defect ออกจาก Operational Issue\n' +
+        '- ท้าทายสมมติฐานที่ยังไม่มีหลักฐานรองรับ และกล้าโต้แย้งทั้ง Muna และ Rin เมื่อพบจุดอ่อนโดยไม่จำเป็นต้องสร้าง Consensus\n' +
+        '- ไม่สร้าง Layer, Database, Workflow หรือ Governance เพิ่มโดยไม่มี Use Case รองรับ พร้อมแยกสิ่งที่ต้องทำตอนนี้ออกจากสิ่งที่ทำภายหลังได้\n' +
+        '- ส่งผลการทบทวนและข้อโต้แย้งทั้งหมดถึง Muna (Discussion Lead) เพื่อสังเคราะห์เสนอ Project Owner',
+      muna:
+        'คุณคือ "Muna (มูนา)" — Discussion Lead & Solution Synthesizer ใน Goldfish Project\n' +
+        'บุคลิก: ผู้ประสานงานหลัก อบอุ่น รอบคอบ มีความคิดเป็นระบบ มองภาพรวมและเข้าใจเจตนาของ Project Owner\n' +
+        'หน้าที่และลักษณะการตอบ:\n' +
+        '- ดำเนินการประชุม รักษาขอบเขต คุม Scope & Complexity ไม่ให้ใหญ่เกินจำเป็น และกล้าทักท้วงเมื่อข้อเสนอซับซ้อนเกินไป\n' +
+        '- ไม่สร้างข้อกำหนดหรือมติแทน Project Owner สรุปทั้งจุดเห็นพ้องและจุดเห็นต่างโดยไม่บังคับให้เห็นตรงกัน และเสนอแนวทางหลักที่เหมาะสมที่สุดเพียง 1 แนวทางพร้อมเหตุผล\n' +
+        '- เมื่อสรุปการประชุม ให้จัดโครงสร้างตาม Meeting Output 7 หัวข้อเสมอ:\n' +
+        '  1) Key Findings\n' +
+        '  2) Points of Agreement\n' +
+        '  3) Points of Disagreement\n' +
+        '  4) Risks & Constraints\n' +
+        '  5) Recommended Actions\n' +
+        '  6) Required Owner Decisions\n' +
+        '  7) Deferred / Future Considerations'
+    };
+
+    const TEAM_META = [
+      { role: 'rin', name: 'Rin', label: 'Rin (ริน) · Operational Analyst' },
+      { role: 'eve', name: 'Eve', label: 'Eve (อีฟ) · Structural Reviewer' }
+    ];
+
+    const MUNA_META = {
+      role: 'muna',
+      name: 'Muna',
+      label: 'Muna (มูนา) · Discussion Lead & Synthesizer'
+    };
+
+    // ===== 2. สถานะของแอปตาม localStorage Schema v1 =====
+    const state = {
+      schemaVersion: SCHEMA_VERSION,
+      meta: {
+        mode: 'bridge', // 'bridge' | 'demo'
+        topic: '',
+        round: 0,
+        teamTurn: 0, // 0 = Rin, 1 = Eve
+        stage: 'idle', // 'idle' | 'lead_open' | 'wait_rin' | 'lead_review_rin' | 'wait_eve' | 'lead_synthesize' | 'done_round'
+        updatedAt: null
+      },
+      prompts: { ...DEFAULT_PROMPTS },
+      rooms: {
+        team: [], // { id, role, author, tag, text, ts }
+        muna: []  // { id, role, author, tag, text, ts }
+      },
+      drafts: {
+        pendingOwnerPrompt: ''
+      },
+      context: {
+        teamSummary: '',
+        summarizedUpTo: 0
+      },
+      tasks: [],
+      prefs: {
+        exportIncludeExtras: true,
+        exportIncludePrompts: false
+      },
+      isRunning: false,
+      timers: []
+    };
+
+    let toastTimer = null;
+
+    // ===== 3. อ้างอิง DOM Elements =====
+    const els = {
+      versionBadge: document.getElementById('versionBadge'),
+      modeBadge: document.getElementById('modeBadge'),
+      saveIndicator: document.getElementById('saveIndicator'),
+      btnModeBridge: document.getElementById('btnModeBridge'),
+      btnModeDemo: document.getElementById('btnModeDemo'),
+      btnTaskPanel: document.getElementById('btnTaskPanel'),
+      btnOpenPrompts: document.getElementById('btnOpenPrompts'),
+      btnDownloadMd: document.getElementById('btnDownloadMd'),
+      btnReset: document.getElementById('btnReset'),
+      tabTeam: document.getElementById('tabTeam'),
+      tabMuna: document.getElementById('tabMuna'),
+      paneTeam: document.getElementById('paneTeam'),
+      paneMuna: document.getElementById('paneMuna'),
+      teamStatus: document.getElementById('teamStatus'),
+      teamRoundInfo: document.getElementById('teamRoundInfo'),
+      teamChatList: document.getElementById('teamChatList'),
+      teamEmpty: document.getElementById('teamEmpty'),
+      teamBridgePanel: document.getElementById('teamBridgePanel'),
+      teamTurnLabel: document.getElementById('teamTurnLabel'),
+      teamWaitNote: document.getElementById('teamWaitNote'),
+      teamWaitText: document.getElementById('teamWaitText'),
+      munaTurnLabel: document.getElementById('munaTurnLabel'),
+      munaWaitNote: document.getElementById('munaWaitNote'),
+      munaWaitText: document.getElementById('munaWaitText'),
+      stepLeadOpen: document.getElementById('stepLeadOpen'),
+      stepRin: document.getElementById('stepRin'),
+      stepLeadRin: document.getElementById('stepLeadRin'),
+      stepEve: document.getElementById('stepEve'),
+      stepLeadSynth: document.getElementById('stepLeadSynth'),
+      teamTokenEst: document.getElementById('teamTokenEst'),
+      btnToggleTeamPrompt: document.getElementById('btnToggleTeamPrompt'),
+      btnCopyTeamPrompt: document.getElementById('btnCopyTeamPrompt'),
+      teamPromptPreview: document.getElementById('teamPromptPreview'),
+      teamReplyInput: document.getElementById('teamReplyInput'),
+      btnSaveTeamReply: document.getElementById('btnSaveTeamReply'),
+      topicForm: document.getElementById('topicForm'),
+      topicInput: document.getElementById('topicInput'),
+      btnSendTopic: document.getElementById('btnSendTopic'),
+      topicDisplay: document.getElementById('topicDisplay'),
+      btnTeamNext: document.getElementById('btnTeamNext'),
+      teamPills: document.querySelectorAll('#paneTeam .pill'),
+      munaStatus: document.getElementById('munaStatus'),
+      syncCount: document.getElementById('syncCount'),
+      munaChatList: document.getElementById('munaChatList'),
+      munaEmpty: document.getElementById('munaEmpty'),
+      munaBridgePanel: document.getElementById('munaBridgePanel'),
+      munaTokenEst: document.getElementById('munaTokenEst'),
+      btnToggleMunaPrompt: document.getElementById('btnToggleMunaPrompt'),
+      btnCopyMunaPrompt: document.getElementById('btnCopyMunaPrompt'),
+      munaPromptPreview: document.getElementById('munaPromptPreview'),
+      munaReplyInput: document.getElementById('munaReplyInput'),
+      btnSaveMunaReply: document.getElementById('btnSaveMunaReply'),
+      munaForm: document.getElementById('munaForm'),
+      munaInput: document.getElementById('munaInput'),
+      btnSendMuna: document.getElementById('btnSendMuna'),
+      promptModal: document.getElementById('promptModal'),
+      btnClosePrompts: document.getElementById('btnClosePrompts'),
+      btnResetPrompts: document.getElementById('btnResetPrompts'),
+      btnSavePrompts: document.getElementById('btnSavePrompts'),
+      inputMeetingRules: document.getElementById('inputMeetingRules'),
+      inputPromptRin: document.getElementById('inputPromptRin'),
+      inputPromptEve: document.getElementById('inputPromptEve'),
+      inputPromptMuna: document.getElementById('inputPromptMuna'),
+      taskPanel: document.getElementById('taskPanel'),
+      taskList: document.getElementById('taskList'),
+      taskInput: document.getElementById('taskInput'),
+      taskCount: document.getElementById('taskCount'),
+      btnCloseTask: document.getElementById('btnCloseTask'),
+      btnClearDone: document.getElementById('btnClearDone'),
+      btnAddTask: document.getElementById('btnAddTask'),
+      exportModal: document.getElementById('exportModal'),
+      exportMetaSummary: document.getElementById('exportMetaSummary'),
+      exportPreviewDetails: document.getElementById('exportPreviewDetails'),
+      exportPreviewMd: document.getElementById('exportPreviewMd'),
+      chkExportExtras: document.getElementById('chkExportExtras'),
+      chkExportPrompts: document.getElementById('chkExportPrompts'),
+      btnCloseExport: document.getElementById('btnCloseExport'),
+      btnCopyExportMd: document.getElementById('btnCopyExportMd'),
+      btnConfirmDownloadMd: document.getElementById('btnConfirmDownloadMd'),
+      btnBackupJson: document.getElementById('btnBackupJson'),
+      btnRestoreJson: document.getElementById('btnRestoreJson'),
+      inputRestoreJson: document.getElementById('inputRestoreJson'),
+      autoBackupRow: document.getElementById('autoBackupRow'),
+      selectAutoBackup: document.getElementById('selectAutoBackup'),
+      btnRestoreAutoBackup: document.getElementById('btnRestoreAutoBackup'),
+      toast: document.getElementById('toast')
+    };
+
+    // ===== 4. ระบบบันทึกและโหลดจาก localStorage =====
+    function saveState() {
+      state.meta.updatedAt = new Date().toISOString();
+      const payload = buildPayloadObject();
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        els.saveIndicator.textContent = '● บันทึกแล้ว';
+      } catch (e) {
+        els.saveIndicator.textContent = '○ โหมดชั่วคราว';
+      }
+    }
+
+    // ----- ตรวจและทำให้ข้อมูลปลอดภัยก่อนใช้งาน: เส้นทางเดียวสำหรับทั้งโหลดตอนเปิดแอปและ Restore -----
+    const VALID_STAGES = ['idle', 'lead_open', 'wait_rin', 'lead_review_rin', 'wait_eve', 'lead_synthesize', 'done_round'];
+    const VALID_ROLES = ['rin', 'eve', 'muna', 'owner', 'directive', 'handoff'];
+    const BACKUP_PREFIX = STORAGE_KEY + '_backup_';
+    const MAX_BACKUPS = 3;
+    const MAX_RESTORE_BYTES = 5 * 1024 * 1024;
+
+    // เหตุที่โหลดข้อมูลเดิมไม่สมบูรณ์: null | 'storage' | 'schema' | 'corrupt' | 'partial'
+    let loadIssue = null;
+    let loadBackupKey = '';
+    let loadDropped = 0;
+
+    function buildPayloadObject() {
+      return {
+        schemaVersion: SCHEMA_VERSION,
+        meta: state.meta,
+        prompts: state.prompts,
+        rooms: state.rooms,
+        drafts: state.drafts,
+        context: state.context,
+        tasks: state.tasks,
+        prefs: state.prefs
+      };
+    }
+
+    function asText(v, fallback) {
+      return typeof v === 'string' ? v : fallback;
+    }
+
+    function toCount(v) {
+      const n = Math.floor(Number(v));
+      return Number.isFinite(n) && n > 0 ? n : 0;
+    }
+
+    function normalizeMessage(m) {
+      if (!m || typeof m !== 'object' || Array.isArray(m)) return null;
+      if (typeof m.text !== 'string' || VALID_ROLES.indexOf(m.role) < 0) return null;
+      return {
+        id: typeof m.id === 'string' && m.id ? m.id : makeId(),
+        role: m.role,
+        author: asText(m.author, m.role),
+        tag: asText(m.tag, ''),
+        text: m.text,
+        ts: typeof m.ts === 'number' && Number.isFinite(m.ts) ? m.ts : Date.now()
+      };
+    }
+
+    function normalizeTask(t) {
+      if (!t || typeof t !== 'object' || Array.isArray(t)) return null;
+      if (typeof t.text !== 'string' || !t.text.trim()) return null;
+      return {
+        id: typeof t.id === 'string' && t.id ? t.id : makeId(),
+        text: t.text,
+        done: Boolean(t.done),
+        ts: typeof t.ts === 'number' && Number.isFinite(t.ts) ? t.ts : Date.now()
+      };
+    }
+
+    // คืน { ok:true, data, dropped } หรือ { ok:false, reason:'invalid'|'schema', found }
+    // ไม่แตะ state เลย — ให้ผู้เรียกตัดสินใจก่อนเรียก applyNormalized
+    function normalizePayload(parsed) {
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        return { ok: false, reason: 'invalid' };
+      }
+      if (parsed.schemaVersion !== SCHEMA_VERSION) {
+        return { ok: false, reason: 'schema', found: parsed.schemaVersion };
+      }
+      let dropped = 0;
+      const collect = (arr, fn) => {
+        if (arr === undefined) return [];
+        if (!Array.isArray(arr)) { dropped += 1; return []; }
+        const kept = [];
+        arr.forEach((item) => {
+          const n = fn(item);
+          if (n) kept.push(n); else dropped += 1;
+        });
+        return kept;
+      };
+
+      const pm = parsed.meta && typeof parsed.meta === 'object' ? parsed.meta : {};
+      const topic = asText(pm.topic, '');
+      const meta = {
+        mode: pm.mode === 'demo' ? 'demo' : 'bridge',
+        topic: topic,
+        round: toCount(pm.round),
+        teamTurn: pm.teamTurn === 1 ? 1 : 0,
+        stage: topic.trim() && VALID_STAGES.indexOf(pm.stage) >= 0 ? pm.stage : 'idle',
+        updatedAt: asText(pm.updatedAt, null)
+      };
+
+      const pr = parsed.rooms && typeof parsed.rooms === 'object' ? parsed.rooms : {};
+      const team = collect(pr.team, normalizeMessage);
+      const muna = collect(pr.muna, normalizeMessage);
+      const tasks = collect(parsed.tasks, normalizeTask);
+
+      const pp = parsed.prompts && typeof parsed.prompts === 'object' ? parsed.prompts : {};
+      const prompts = {};
+      Object.keys(DEFAULT_PROMPTS).forEach((k) => {
+        prompts[k] = typeof pp[k] === 'string' && pp[k].trim() ? pp[k] : DEFAULT_PROMPTS[k];
+      });
+
+      const pd = parsed.drafts && typeof parsed.drafts === 'object' ? parsed.drafts : {};
+      const pc = parsed.context && typeof parsed.context === 'object' ? parsed.context : {};
+      const pf = parsed.prefs && typeof parsed.prefs === 'object' ? parsed.prefs : {};
+
+      return {
+        ok: true,
+        dropped: dropped,
+        data: {
+          meta: meta,
+          prompts: prompts,
+          rooms: { team: team, muna: muna },
+          drafts: { pendingOwnerPrompt: asText(pd.pendingOwnerPrompt, '') },
+          context: {
+            teamSummary: asText(pc.teamSummary, ''),
+            summarizedUpTo: Math.min(toCount(pc.summarizedUpTo), team.length)
+          },
+          tasks: tasks,
+          prefs: {
+            exportIncludeExtras: pf.exportIncludeExtras !== false,
+            exportIncludePrompts: Boolean(pf.exportIncludePrompts)
+          }
+        }
+      };
+    }
+
+    function applyNormalized(d) {
+      Object.assign(state.meta, d.meta);
+      state.prompts = d.prompts;
+      state.rooms.team = d.rooms.team;
+      state.rooms.muna = d.rooms.muna;
+      state.drafts.pendingOwnerPrompt = d.drafts.pendingOwnerPrompt;
+      state.context.teamSummary = d.context.teamSummary;
+      state.context.summarizedUpTo = d.context.summarizedUpTo;
+      state.tasks = d.tasks;
+      state.prefs.exportIncludeExtras = d.prefs.exportIncludeExtras;
+      state.prefs.exportIncludePrompts = d.prefs.exportIncludePrompts;
+    }
+
+    // ----- ชุดสำรองอัตโนมัติใน localStorage (เก็บล่าสุด MAX_BACKUPS ชุด) -----
+    function listBackupKeys() {
+      const keys = [];
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.indexOf(BACKUP_PREFIX) === 0) keys.push(k);
+        }
+      } catch (e) { /* ไม่มีสิทธิ์เข้าถึง storage */ }
+      return keys.sort().reverse(); // ใหม่สุดก่อน (timestamp ยาวเท่ากัน เรียงตามตัวอักษรได้)
+    }
+
+    function writeBackup(raw) {
+      try {
+        const oldestFirst = listBackupKeys().reverse();
+        while (oldestFirst.length >= MAX_BACKUPS) {
+          localStorage.removeItem(oldestFirst.shift());
+        }
+        const key = BACKUP_PREFIX + Date.now();
+        localStorage.setItem(key, raw);
+        return key;
+      } catch (e) {
+        return '';
+      }
+    }
+
+    // สำรองข้อมูลดิบที่อ่านไม่ได้/อ่านได้ไม่ครบ ก่อนที่การบันทึกครั้งถัดไปจะเขียนทับคีย์หลัก
+    function stashUnreadable(raw, reason) {
+      loadIssue = reason;
+      loadBackupKey = writeBackup(raw);
+    }
+
+    function loadState() {
+      let raw = null;
+      try {
+        raw = localStorage.getItem(STORAGE_KEY);
+      } catch (e) {
+        loadIssue = 'storage';
+        return false;
+      }
+      if (!raw) return false;
+
+      let parsed;
+      try {
+        parsed = JSON.parse(raw);
+      } catch (e) {
+        stashUnreadable(raw, 'corrupt');
+        return false;
+      }
+      const res = normalizePayload(parsed);
+      if (!res.ok) {
+        stashUnreadable(raw, res.reason === 'schema' ? 'schema' : 'corrupt');
+        return false;
+      }
+      applyNormalized(res.data);
+      if (res.dropped > 0) {
+        loadDropped = res.dropped;
+        stashUnreadable(raw, 'partial'); // เก็บฉบับเดิมไว้ เพราะรายการที่เสียจะหายไปเมื่อบันทึกครั้งหน้า
+      }
+      return true;
+    }
+
+    // ===== 5. ฟังก์ชันช่วยพื้นฐาน =====
+    function makeId() {
+      return 'm_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function showToast(text, duration) {
+      if (!text) return;
+      if (toastTimer) clearTimeout(toastTimer);
+      els.toast.textContent = text;
+      els.toast.classList.add('show');
+      toastTimer = setTimeout(() => {
+        els.toast.classList.remove('show');
+        toastTimer = null;
+      }, duration || 2200);
+    }
+
+    function copyText(text, successMsg) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+          .then(() => { if (successMsg) showToast(successMsg); })
+          .catch(() => fallbackCopy(text, successMsg));
+      } else {
+        fallbackCopy(text, successMsg);
+      }
+    }
+
+    function fallbackCopy(text, successMsg) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        if (successMsg) showToast(successMsg);
+      } catch (e) {
+        showToast('ไม่สามารถคัดลอกอัตโนมัติได้');
+      }
+      document.body.removeChild(ta);
+    }
+
+    function estimateTokens(text) {
+      if (!text) return 0;
+      const thaiMatches = text.match(/[\u0E00-\u0E7F]/g);
+      const thaiCount = thaiMatches ? thaiMatches.length : 0;
+      const otherCount = text.length - thaiCount;
+      return Math.ceil((thaiCount / 1.6) + (otherCount / 4));
+    }
+
+    // ===== 6. แสดงผลข้อความแชท + copy per-message =====
+    function makeCopyBtn(text) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn-copy-msg';
+      btn.textContent = 'คัดลอก';
+      btn.setAttribute('aria-label', 'คัดลอกข้อความนี้');
+      btn.addEventListener('click', () => {
+        copyText(text, '');
+        btn.textContent = '✓ คัดลอกแล้ว';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'คัดลอก';
+          btn.classList.remove('copied');
+        }, 1800);
+      });
+      return btn;
+    }
+
+    function appendTeamMessage(msg) {
+      if (els.teamEmpty) els.teamEmpty.style.display = 'none';
+      const div = document.createElement('div');
+      div.className = 'msg ' + msg.role;
+
+      const meta = document.createElement('div');
+      meta.className = 'msg-meta';
+      meta.innerHTML =
+        '<span class="msg-author">' + escapeHtml(msg.author) + '</span>' +
+        '<span class="msg-round">' + escapeHtml(msg.tag) + '</span>';
+
+      const body = document.createElement('div');
+      body.textContent = msg.text;
+
+      const footer = document.createElement('div');
+      footer.className = 'msg-footer';
+      footer.appendChild(makeCopyBtn(msg.text));
+
+      div.appendChild(meta);
+      div.appendChild(body);
+      div.appendChild(footer);
+      els.teamChatList.appendChild(div);
+      els.teamChatList.scrollTop = els.teamChatList.scrollHeight;
+      els.syncCount.textContent = 'เห็นแชทฝั่งซ้าย ' + state.rooms.team.length + ' ข้อความ';
+    }
+
+    function appendMunaMessage(msg) {
+      if (els.munaEmpty) els.munaEmpty.style.display = 'none';
+      const div = document.createElement('div');
+      div.className = 'msg ' + msg.role;
+
+      const meta = document.createElement('div');
+      meta.className = 'msg-meta';
+      meta.innerHTML =
+        '<span class="msg-author">' + escapeHtml(msg.author) + '</span>' +
+        '<span class="msg-round">' + escapeHtml(msg.tag) + '</span>';
+
+      const body = document.createElement('div');
+      body.textContent = msg.text;
+
+      const footer = document.createElement('div');
+      footer.className = 'msg-footer';
+      footer.appendChild(makeCopyBtn(msg.text));
+
+      if (msg.role === 'muna') {
+        const dirBtn = document.createElement('button');
+        dirBtn.type = 'button';
+        dirBtn.className = 'send-directive-btn';
+        dirBtn.textContent = 'ส่งกรอบประเด็นไปห้องซ้าย →';
+        dirBtn.addEventListener('click', () => pushDirectiveToTeam(msg.text));
+        footer.appendChild(dirBtn);
+      }
+
+      div.appendChild(meta);
+      div.appendChild(body);
+      div.appendChild(footer);
+      els.munaChatList.appendChild(div);
+      els.munaChatList.scrollTop = els.munaChatList.scrollHeight;
+    }
+
+    // ===== 7. Context Summary (Pure Prompt Builders) =====
+    function syncTeamContextSummary() {
+      const total = state.rooms.team.length;
+      if (total <= CTX.TEAM_SUMMARIZE_AT) return false;
+
+      const windowStart = total - CTX.TEAM_WINDOW;
+      if (state.context.summarizedUpTo >= windowStart) return false;
+
+      const toSummarize = state.rooms.team.slice(state.context.summarizedUpTo, windowStart);
+      if (toSummarize.length === 0) return false;
+
+      const lines = toSummarize.map((m) => {
+        const preview = m.text.split('\n')[0].slice(0, 80);
+        return '- [' + m.author.split(' ')[0] + ' ' + (m.tag || '') + ']: ' + preview;
+      });
+      state.context.teamSummary = (state.context.teamSummary
+        ? state.context.teamSummary + '\n' : '') + lines.join('\n');
+      state.context.summarizedUpTo = windowStart;
+      return true;
+    }
+
+    function recordTeamMessage(msg) {
+      state.rooms.team.push(msg);
+      syncTeamContextSummary();
+      appendTeamMessage(msg);
+    }
+
+    function getTeamSummaryBlock(heading) {
+      if (!state.context.teamSummary) return '';
+      return '### ' + heading + '\n' + state.context.teamSummary + '\n\n';
+    }
+
+    function buildTeamPrompt() {
+      const persona = TEAM_META[state.meta.teamTurn];
+      const rolePrompt = state.prompts[persona.role];
+      const summaryBlock = getTeamSummaryBlock('สรุปบทสนทนาก่อนหน้า (Key Points)');
+      const recent = state.rooms.team.slice(-CTX.TEAM_WINDOW);
+      const historyText = recent.length > 0
+        ? recent.map((m) => '[' + m.author + ']: ' + m.text).join('\n\n')
+        : 'ยังไม่มีบทสนทนาก่อนหน้า (คุณเป็นผู้เปิดการวิเคราะห์คนแรก)';
+
+      return (
+        '### บทบาทของคุณ\n' +
+        rolePrompt + '\n\n' +
+        '### ' + state.prompts.meetingRules + '\n\n' +
+        '### ประเด็นหารือ (Goldfish Project)\n' +
+        state.meta.topic + '\n\n' +
+        summaryBlock +
+        '### บทสนทนาล่าสุดในห้อง Rin × Eve\n' +
+        historyText + '\n\n' +
+        '### คำสั่ง\n' +
+        'ตอบในบทบาทของ ' + persona.label + ' โดยแยก Fact, Analysis, Proposal, Risk และ Owner Decision ให้ชัดเจน และห้ามสร้าง Consensus เทียม'
+      );
+    }
+
+    function buildMunaPrompt() {
+      const teamLog = state.rooms.team.slice(-CTX.MUNA_TEAM_WINDOW);
+      const teamText = teamLog.length > 0
+        ? teamLog.map((m) => '[' + m.author + ']: ' + m.text).join('\n\n')
+        : 'ยังไม่มีบทสนทนาในห้องฝั่งซ้าย';
+
+      const summaryBlock = getTeamSummaryBlock('สรุปบทสนทนาก่อนหน้าในห้อง Rin × Eve');
+      const munaLog = state.rooms.muna.slice(-CTX.MUNA_SELF_WINDOW);
+      const munaText = munaLog.length > 0
+        ? munaLog.map((m) => '[' + m.author + ']: ' + m.text).join('\n\n')
+        : 'เพิ่งเริ่มประสานงานกับ Project Owner';
+
+      return (
+        '### บทบาทของคุณ\n' +
+        state.prompts.muna + '\n\n' +
+        '### ' + state.prompts.meetingRules + '\n\n' +
+        '### ประเด็นหารือ (Goldfish Project)\n' +
+        (state.meta.topic || 'ยังไม่ระบุประเด็น') + '\n\n' +
+        summaryBlock +
+        '### บทสนทนาล่าสุดในห้องซ้าย (Rin × Eve)\n' +
+        teamText + '\n\n' +
+        '### ประวัติแชทล่าสุดระหว่าง Project Owner กับ Muna\n' +
+        munaText + '\n\n' +
+        '### ข้อความล่าสุดจาก Project Owner ถึง Muna\n' +
+        (state.drafts.pendingOwnerPrompt || 'ช่วยสังเคราะห์ผลการหารือล่าสุดตาม Meeting Output 7 หัวข้อ')
+      );
+    }
+
+    function pushDirectiveToTeam(text) {
+      if (!state.meta.topic) {
+        state.meta.topic = 'ประเด็นหารือตามกรอบจาก Muna';
+        state.meta.round = 1;
+        els.topicDisplay.textContent = 'ประเด็น: ' + state.meta.topic;
+        els.teamRoundInfo.textContent = 'รอบที่ 1';
+      }
+      const prevStage = state.meta.stage;
+      let targetName = 'Rin';
+      if (prevStage === 'lead_review_rin') {
+        state.meta.teamTurn = 1;
+        state.meta.stage = 'wait_eve';
+        targetName = 'Eve';
+      } else {
+        state.meta.teamTurn = 0;
+        state.meta.stage = 'wait_rin';
+        targetName = 'Rin';
+      }
+      state.drafts.pendingOwnerPrompt = '';
+
+      const dirMsg = {
+        id: makeId(),
+        role: 'directive',
+        author: 'กรอบประเด็นจาก Muna → ' + targetName,
+        tag: 'รอบที่ ' + state.meta.round,
+        text,
+        ts: Date.now()
+      };
+      recordTeamMessage(dirMsg);
+      updateTeamBridgeUI();
+      updateMunaBridgeUI();
+      saveState();
+      showToast('ส่งกรอบประเด็นจาก Muna → ' + targetName + ' แล้ว');
+    }
+
+    function updateFlowBarUI() {
+      const s = state.meta.stage;
+      els.stepLeadOpen.className = 'flow-step' + (s === 'lead_open' ? ' active' : '');
+      els.stepRin.className = 'flow-step' + (s === 'wait_rin' ? ' active-rin' : '');
+      els.stepLeadRin.className = 'flow-step' + (s === 'lead_review_rin' ? ' active' : '');
+      els.stepEve.className = 'flow-step' + (s === 'wait_eve' ? ' active-eve' : '');
+      els.stepLeadSynth.className = 'flow-step' + (s === 'lead_synthesize' ? ' active' : '');
+    }
+
+    function updateTeamBridgeUI() {
+      updateFlowBarUI();
+      const persona = TEAM_META[state.meta.teamTurn];
+      const isTeamStage = state.meta.stage === 'wait_rin' || state.meta.stage === 'wait_eve';
+      const isLeadStage = state.meta.stage === 'lead_open' || state.meta.stage === 'lead_review_rin' || state.meta.stage === 'lead_synthesize';
+      const isDoneStage = state.meta.stage === 'done_round';
+
+      els.teamPills.forEach((pill, idx) => {
+        const isCurrent = isTeamStage && idx === state.meta.teamTurn;
+        pill.classList.toggle('current', isCurrent);
+        pill.setAttribute('aria-pressed', String(isCurrent));
+      });
+
+      const showBridge = state.meta.mode === 'bridge' && Boolean(state.meta.topic) && isTeamStage;
+      const showWait = state.meta.mode === 'bridge' && Boolean(state.meta.topic) && isLeadStage;
+
+      els.teamBridgePanel.classList.toggle('show', showBridge);
+      els.teamWaitNote.classList.toggle('show', showWait);
+
+      if (state.meta.mode === 'bridge' && Boolean(state.meta.topic) && isDoneStage) {
+        els.teamStatus.textContent = 'จบรอบแล้ว — รอ Owner ตัดสินใจหรือเปิดรอบใหม่';
+        els.teamRoundInfo.textContent = 'รอบที่ ' + state.meta.round;
+        els.topicDisplay.textContent = 'ประเด็น: ' + state.meta.topic;
+        els.btnTeamNext.disabled = true;
+        els.btnTeamNext.textContent = 'รอเปิดรอบใหม่';
+        return;
+      }
+
+      if (showWait) {
+        const waitMap = {
+          lead_open: '⏳ คิวอยู่ที่ Muna (ฝั่งขวา) — รอ Muna เปิดกรอบประเด็นส่งให้ Rin',
+          lead_review_rin: '⏳ ส่งคำตอบของ Rin ให้ Muna แล้ว — รอ Muna ตรวจรับและส่งกรอบต่อให้ Eve ที่ฝั่งขวา',
+          lead_synthesize: '⏳ ส่งคำตอบของ Eve ให้ Muna แล้ว — รอ Muna สังเคราะห์ 7 หัวข้อเสนอ Project Owner ที่ฝั่งขวา'
+        };
+        els.teamWaitText.textContent = waitMap[state.meta.stage] || '⏳ รอ Muna (Discussion Lead) ดำเนินการที่ฝั่งขวา';
+        els.teamStatus.textContent = 'รอ Muna (Discussion Lead) ดำเนินการ';
+        els.teamRoundInfo.textContent = 'รอบที่ ' + state.meta.round;
+        els.topicDisplay.textContent = 'ประเด็น: ' + state.meta.topic;
+        els.btnTeamNext.disabled = true;
+        els.btnTeamNext.textContent = 'รอ Muna ส่งกรอบ';
+        return;
+      }
+
+      if (!showBridge) return;
+
+      const prompt = buildTeamPrompt();
+      els.teamTurnLabel.className = 'bridge-turn-label ' + persona.role;
+      els.teamTurnLabel.textContent = 'คิวปัจจุบัน: ' + persona.label + ' (ส่งคำตอบกลับให้ Muna · รอบที่ ' + state.meta.round + ')';
+      els.btnCopyTeamPrompt.textContent = 'คัดลอกพรอมต์ → ' + persona.name;
+      els.teamReplyInput.placeholder = 'วางคำตอบจาก ' + persona.label + ' เพื่อส่งให้ Muna ตรวจรับ... (Ctrl+Enter)';
+      els.teamPromptPreview.textContent = prompt;
+      els.teamTokenEst.textContent = '~' + estimateTokens(prompt) + ' tok';
+      els.teamStatus.textContent = 'รอคำตอบจาก ' + persona.name + ' (ส่งให้ Muna)';
+      els.teamRoundInfo.textContent = 'รอบที่ ' + state.meta.round;
+      els.topicDisplay.textContent = 'ประเด็น: ' + state.meta.topic;
+      els.btnTeamNext.disabled = false;
+      els.btnTeamNext.textContent = 'สลับไปอีกฝั่ง';
+    }
+
+    function updateMunaBridgeUI() {
+      updateFlowBarUI();
+      const s = state.meta.stage;
+      const isLeadStage = s === 'lead_open' || s === 'lead_review_rin' || s === 'lead_synthesize';
+      const showBridge = state.meta.mode === 'bridge' && (Boolean(state.drafts.pendingOwnerPrompt) || isLeadStage);
+      els.munaBridgePanel.classList.toggle('show', showBridge);
+
+      const showMunaWait = state.meta.mode === 'bridge' && !showBridge && Boolean(state.meta.topic) && (s === 'wait_rin' || s === 'wait_eve' || s === 'done_round');
+      els.munaWaitNote.classList.toggle('show', showMunaWait);
+      if (showMunaWait) {
+        const waitTextMap = {
+          wait_rin: '⏳ รอ Rin (Operational Analyst) ส่งคำตอบกลับมาให้ Muna จากฝั่งซ้าย',
+          wait_eve: '⏳ รอ Eve (Structural Reviewer) ส่งผลการทบทวนกลับมาให้ Muna จากฝั่งซ้าย',
+          done_round: '✅ Muna สรุปครบ 7 หัวข้อแล้ว — รอ Project Owner ตัดสินใจหรือเปิดรอบถัดไป'
+        };
+        els.munaWaitText.textContent = waitTextMap[s] || '⏳ รอ Project Owner ตัดสินใจหรือสั่งการ';
+      }
+
+      if (!showBridge) return;
+
+      const stageLabelMap = {
+        lead_open: 'คิว Muna (Discussion Lead): เปิดกรอบประเด็นเพื่อส่งให้ Rin',
+        lead_review_rin: 'คิว Muna (Discussion Lead): รับคำตอบ Rin แล้วส่งกรอบต่อให้ Eve',
+        lead_synthesize: 'คิว Muna (Discussion Lead): รับคำตอบ Eve แล้วสังเคราะห์ 7 หัวข้อเสนอ Owner'
+      };
+      els.munaTurnLabel.textContent = stageLabelMap[state.meta.stage] || 'พรอมต์สำหรับ Muna (แนบแชท Rin × Eve ล่าสุดแล้ว)';
+      els.btnSaveMunaReply.textContent = state.meta.stage === 'lead_open'
+        ? 'บันทึก & ส่งกรอบให้ Rin'
+        : state.meta.stage === 'lead_review_rin'
+          ? 'บันทึก & ส่งกรอบให้ Eve'
+          : 'บันทึกคำตอบ Muna';
+
+      const prompt = buildMunaPrompt();
+      els.munaPromptPreview.textContent = prompt;
+      els.munaTokenEst.textContent = '~' + estimateTokens(prompt) + ' tok';
+      els.munaStatus.textContent = 'ถึงคิว Muna (Discussion Lead) ดำเนินการ';
+    }
+
+    function advanceTeamTurn() {
+      if (state.meta.stage !== 'wait_rin' && state.meta.stage !== 'wait_eve') return;
+      state.meta.teamTurn = (state.meta.teamTurn + 1) % TEAM_META.length;
+      state.meta.stage = state.meta.teamTurn === 0 ? 'wait_rin' : 'wait_eve';
+      updateTeamBridgeUI();
+      updateMunaBridgeUI();
+      saveState();
+    }
+
+    // ===== 8. โหมดจำลองการประชุม Goldfish แบบผ่าน Discussion Lead (Muna) ทุกขั้น =====
+    function runDemoTeamRound(steeringText) {
+      if (state.isRunning) return;
+      state.isRunning = true;
+      state.meta.round += 1;
+      const r = state.meta.round;
+      const focus = steeringText || state.meta.topic;
+
+      els.btnSendTopic.disabled = true;
+      els.btnTeamNext.disabled = true;
+      els.teamRoundInfo.textContent = 'รอบที่ ' + r;
+      els.topicDisplay.textContent = 'ประเด็น: ' + state.meta.topic;
+
+      const steps = [
+        {
+          stage: 'lead_open',
+          run: () => {
+            els.munaStatus.textContent = 'Muna เปิดกรอบการประชุมส่งให้ Rin...';
+            const text = 'เปิดการประชุมรอบที่ ' + r + ' หัวข้อ "' + focus + '" ครับ — ขอเริ่มจาก Rin ช่วยตรวจข้อเท็จจริง ข้อจำกัดหน้างาน และสิ่งที่ยังไม่ได้ตรวจสอบก่อนส่งกลับมาให้มูนาครับ';
+            const mMsg = { id: makeId(), role: 'muna', author: MUNA_META.label, tag: 'เปิดกรอบ → Rin (รอบที่ ' + r + ')', text, ts: Date.now() };
+            state.rooms.muna.push(mMsg);
+            appendMunaMessage(mMsg);
+            recordTeamMessage({ id: makeId(), role: 'directive', author: 'กรอบประเด็นจาก Muna → Rin', tag: 'รอบที่ ' + r, text, ts: Date.now() });
+          }
+        },
+        {
+          stage: 'wait_rin',
+          run: () => {
+            els.teamStatus.textContent = 'Rin กำลังวิเคราะห์และส่งให้ Muna...';
+            const text = '[ส่งถึง Muna · Operational Analysis รอบที่ ' + r + '] สำหรับ "' + focus + '":\n- สิ่งที่ตรวจแล้ว: ยังไม่มีไฟล์ข้อมูลดิบแนบในรอบนี้\n- ความเสี่ยงหน้างาน: ถ้าขยายฟีเจอร์ก่อนเก็บกวาดฐานข้อมูลตั้งต้นจะเกิดงานแก้ซ้ำ\n- ข้อเสนอปฏิบัติ: ล็อกชุดข้อมูลตัวอย่างเล็กๆ 1 ชุดพร้อมเกณฑ์ตรวจผลก่อนลงมือ';
+            recordTeamMessage({ id: makeId(), role: 'rin', author: TEAM_META[0].label, tag: 'ส่งให้ Muna · รอบที่ ' + r, text, ts: Date.now() });
+            const hMsg = { id: makeId(), role: 'handoff', author: '📥 Rin ส่งคำตอบให้ Muna', tag: 'รอบที่ ' + r, text, ts: Date.now() };
+            state.rooms.muna.push(hMsg);
+            appendMunaMessage(hMsg);
+          }
+        },
+        {
+          stage: 'lead_review_rin',
+          run: () => {
+            els.munaStatus.textContent = 'Muna รับข้อมูล Rin และส่งต่อให้ Eve...';
+            const text = 'มูนารับรายงานจาก Rin แล้วครับ — ส่งต่อให้ Eve ช่วยทบทวนเชิงโครงสร้างว่า Data Model และขอบเขตที่ Rin เสนอมี Structural Defect หรือความซับซ้อนเกินจำเป็นตรงไหน แล้วส่งกลับมูนาครับ';
+            const mMsg = { id: makeId(), role: 'muna', author: MUNA_META.label, tag: 'ส่งต่อ → Eve (รอบที่ ' + r + ')', text, ts: Date.now() };
+            state.rooms.muna.push(mMsg);
+            appendMunaMessage(mMsg);
+            recordTeamMessage({ id: makeId(), role: 'directive', author: 'กรอบประเด็นจาก Muna → Eve', tag: 'รอบที่ ' + r, text, ts: Date.now() });
+          }
+        },
+        {
+          stage: 'wait_eve',
+          run: () => {
+            els.teamStatus.textContent = 'Eve กำลังทบทวนโครงสร้างและส่งให้ Muna...';
+            const text = '[ส่งถึง Muna · Structural Review รอบที่ ' + r + '] ขอโต้แย้งและเสริมจุดที่ Rin ยังไม่แยกชัด:\n- Structural Defect vs Operational Issue: ต้องล็อก Schema และอำนาจตัดสินใจ (Owner Authorization) ก่อนสร้างเครื่องมือเพิ่ม\n- ข้อควรระวัง: อย่าเพิ่ม Layer หรือ Work Log ซ้อนโดยไม่มี Use Case รองรับ ("Build the world, not the bureaucracy")';
+            recordTeamMessage({ id: makeId(), role: 'eve', author: TEAM_META[1].label, tag: 'ส่งให้ Muna · รอบที่ ' + r, text, ts: Date.now() });
+            const hMsg = { id: makeId(), role: 'handoff', author: '📥 Eve ส่งคำตอบให้ Muna', tag: 'รอบที่ ' + r, text, ts: Date.now() };
+            state.rooms.muna.push(hMsg);
+            appendMunaMessage(hMsg);
+          }
+        },
+        {
+          stage: 'lead_synthesize',
+          run: () => {
+            els.munaStatus.textContent = 'Muna สังเคราะห์ 7 หัวข้อเสนอ Project Owner...';
+            const summary =
+              '1) Key Findings: Rin เน้นความเสี่ยงข้อมูลดิบและเกณฑ์ตรวจผล ส่วน Eve เตือนเรื่องล็อก Schema และไม่สร้าง Layer เกินจำเป็น\n' +
+              '2) Points of Agreement: เห็นพ้องให้เริ่มจากขอบเขตเล็กที่สุดและทำความสะอาดสิ่งที่มีก่อนขยาย\n' +
+              '3) Points of Disagreement: Rin เสนอขั้นตอนตรวจงานละเอียด แต่ Eve กังวลว่าจะกลายเป็นภาระ (Bureaucracy)\n' +
+              '4) Risks & Constraints: ห้ามแก้เอกสารจริง/GitHub/Notion ก่อนได้รับอนุมัติจาก Project Owner\n' +
+              '5) Recommended Actions: ล็อก Data Model ขั้นต่ำ 1 ชุดและทดสอบกับข้อมูลจริง 1 รอบก่อน\n' +
+              '6) Required Owner Decisions: Project Owner อนุมัติเริ่มจากสเปกขั้นต่ำนี้หรือไม่?\n' +
+              '7) Deferred / Future Considerations: ระบบ Multi-project และ Automation ขั้นสูง';
+            const mMsg = { id: makeId(), role: 'muna', author: MUNA_META.label, tag: 'สรุป 7 หัวข้อ (รอบที่ ' + r + ')', text: summary, ts: Date.now() };
+            state.rooms.muna.push(mMsg);
+            appendMunaMessage(mMsg);
+            state.meta.stage = 'done_round';
+            state.isRunning = false;
+            els.btnSendTopic.disabled = false;
+            els.btnTeamNext.disabled = false;
+            els.teamStatus.textContent = 'จบรอบที่ ' + r + ' (ผ่าน Muna ครบทุกขั้น)';
+            els.munaStatus.textContent = 'Muna สรุปเสนอ Project Owner แล้ว';
+            els.btnSendTopic.textContent = 'แทรกประเด็นรอบใหม่';
+          }
+        }
+      ];
+
+      steps.forEach((step, idx) => {
+        const id = setTimeout(() => {
+          state.meta.stage = step.stage;
+          updateFlowBarUI();
+          step.run();
+          updateFlowBarUI();
+          saveState();
+        }, (idx + 1) * 650);
+        state.timers.push(id);
+      });
+    }
+
+    function runDemoMunaReply(ownerText) {
+      els.munaStatus.textContent = 'Muna กำลังสังเคราะห์...';
+      const teamCount = state.rooms.team.length;
+
+      let reply = '';
+      if (teamCount === 0) {
+        reply = 'สวัสดีครับ Project Owner ตอนนี้ห้อง Rin × Eve ยังไม่ได้เปิดประเด็นหารือครับ แนะนำให้ตั้งหัวข้อทางฝั่งซ้ายก่อน เพื่อให้ทั้งสองฝ่ายวิเคราะห์ข้อเท็จจริงและโครงสร้าง แล้วมูนาจะช่วยสังเคราะห์เป็น Meeting Output 7 หัวข้อให้ครับ';
+      } else if (ownerText.includes('กรอบ') || ownerText.includes('Scope')) {
+        reply = 'กรอบประเด็นสำหรับรอบถัดไป (ส่งไปห้อง Rin × Eve):\n- ให้ Rin ระบุรายการข้อมูลจริงที่มีอยู่ตอนนี้และขั้นตอนตรวจรับผล 1–2 ข้อ\n- ให้ Eve ตรวจเฉพาะโครงสร้างหลักที่ต้องล็อกวันนี้ โดยยังไม่เพิ่ม Layer ใหม่\n(กดปุ่ม "ส่งกรอบประเด็นไปห้องซ้าย →" ด้านล่างได้เลยครับ)';
+      } else {
+        reply =
+          '1) Key Findings:\n- Rin ชี้ความเสี่ยงเรื่องข้อมูลตั้งต้นและขั้นตอนตรวจสอบผล ส่วน Eve เตือนไม่ให้เพิ่ม Layer หรือ Workflow เกินจำเป็น\n\n' +
+          '2) Points of Agreement:\n- เห็นพ้องให้เริ่มจากโครงสร้างที่เล็กที่สุดและทำความสะอาดสิ่งที่มีอยู่ก่อนขยาย ("Clean up what we have before scaling what we build")\n\n' +
+          '3) Points of Disagreement:\n- Rin เสนอให้เพิ่มการบันทึก Work Log อย่างละเอียด แต่ Eve มองว่าอาจกลายเป็นภาระเกินจำเป็นหากยังไม่มี Use Case ชัดเจน\n\n' +
+          '4) Risks & Constraints:\n- ยังไม่มีข้อมูลตัวอย่างจริงแนบมา และห้ามแก้ไขเอกสารจริง/Notion/GitHub ก่อนได้รับอนุมัติจาก Owner\n\n' +
+          '5) Recommended Actions:\n- ล็อก Data Model ขั้นต่ำ 1 ชุดและทดสอบกับข้อมูลตัวอย่างจริง 1 รอบก่อนตัดสินใจขยายระบบ\n\n' +
+          '6) Required Owner Decisions:\n- Project Owner ต้องการให้เก็บเฉพาะบันทึกผลลัพธ์หลัก (แนวทาง Eve) หรือเก็บ Work Log ละเอียดทุกขั้น (แนวทาง Rin)?\n\n' +
+          '7) Deferred / Future Considerations:\n- การเพิ่ม Layer จัดการหลายโปรเจกต์และระบบ Automation ขั้นสูง';
+      }
+
+      const id = setTimeout(() => {
+        const msg = {
+          id: makeId(),
+          role: 'muna',
+          author: MUNA_META.label,
+          tag: 'สังเคราะห์รอบที่ ' + state.meta.round,
+          text: reply,
+          ts: Date.now()
+        };
+        state.rooms.muna.push(msg);
+        appendMunaMessage(msg);
+        els.munaStatus.textContent = 'Muna สังเคราะห์เสร็จแล้ว';
+        saveState();
+      }, 500);
+      state.timers.push(id);
+    }
+
+    // ===== 9. ส่งออกบันทึกการประชุมทั้งหมดเป็นไฟล์ .md (QA Hardened) =====
+    function escapeMdInline(text) {
+      return String(text == null ? '' : text)
+        .replace(/^\s+|\s+$/g, '')
+        .replace(/\r?\n+/g, ' ')
+        .replace(/\\/g, '\\\\')
+        .replace(/([|`*_\[\]<>])/g, '\\$1');
+    }
+
+    // escape '<' ที่อาจกลายเป็น HTML ดิบ เฉพาะ "นอก" inline code span (`...` / ``...``)
+    function escapeOutsideInlineCode(text) {
+      let out = '';
+      let i = 0;
+      while (i < text.length) {
+        const ch = text[i];
+        if (ch === '`') {
+          let n = 1;
+          while (text[i + n] === '`') n++;
+          let j = i + n;
+          let close = -1;
+          while (j < text.length) {
+            if (text[j] === '`') {
+              let m = 1;
+              while (text[j + m] === '`') m++;
+              if (m === n) { close = j; break; }
+              j += m;
+            } else {
+              j++;
+            }
+          }
+          if (close >= 0) {
+            out += text.slice(i, close + n); // code span: คงเดิมทุกตัวอักษร
+            i = close + n;
+          } else {
+            out += text.slice(i, i + n);     // backtick ที่ไม่มีคู่ = ข้อความธรรมดา
+            i += n;
+          }
+          continue;
+        }
+        if (ch === '<' && /[A-Za-z\/!?]/.test(text[i + 1] || '')) {
+          let back = 0;
+          for (let k = i - 1; k >= 0 && text[k] === '\\'; k--) back++;
+          out += back % 2 === 1 ? ch : '\\<'; // ถ้ามี backslash escape อยู่แล้ว ไม่ซ้ำ
+        } else {
+          out += ch;
+        }
+        i++;
+      }
+      return out;
+    }
+
+    // ทำให้เนื้อข้อความปลอดภัยต่อโครงเอกสาร .md โดย "ไม่แตะโค้ด"
+    // - code fence (``` / ~~~) และ indented code block: คงเดิมทุกตัวอักษร; fence ที่ค้างไม่ปิดจะถูกปิดท้ายข้อความ
+    // - นอกโค้ด: หัวข้อ ATX (#) และ Setext (=== / ---) แปลงเป็นตัวหนา เพื่อไม่ให้ชนลำดับหัวข้อและสารบัญของไฟล์
+    // - นอกโค้ด: escape '<' (กัน HTML ดิบ) ยกเว้นใน inline code
+    function escapeMdBody(text) {
+      const lines = String(text || '').replace(/\r\n/g, '\n').trim().split('\n');
+      const out = [];
+      let fenceChar = '';
+      let fenceLen = 0;
+      let prevBlank = true;
+      let inIndentedCode = false;
+
+      for (let idx = 0; idx < lines.length; idx++) {
+        const line = lines[idx];
+        const fm = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+
+        if (fenceChar) {
+          out.push(line);
+          if (fm && fm[1][0] === fenceChar && fm[1].length >= fenceLen && fm[2].trim() === '') {
+            fenceChar = '';
+            fenceLen = 0;
+            prevBlank = true;
+          }
+          continue;
+        }
+
+        if (line.trim() === '') {
+          out.push(line);
+          prevBlank = true;
+          continue;
+        }
+
+        if (/^( {4}|\t)/.test(line) && (prevBlank || inIndentedCode)) {
+          inIndentedCode = true;
+          out.push(line);
+          prevBlank = false;
+          continue;
+        }
+        inIndentedCode = false;
+
+        // เปิด fence (fence แบบ backtick ห้ามมี backtick ใน info string — ไม่งั้นเป็น inline code)
+        if (fm && !(fm[1][0] === '`' && fm[2].indexOf('`') >= 0)) {
+          fenceChar = fm[1][0];
+          fenceLen = fm[1].length;
+          out.push(line);
+          prevBlank = false;
+          continue;
+        }
+
+        const hm = line.match(/^ {0,3}#{1,6}(?:\s+(.*?))?(?:\s+#+)?\s*$/);
+        if (hm) {
+          out.push(hm[1] ? '**' + escapeOutsideInlineCode(hm[1]) + '**' : '');
+          prevBlank = false;
+          continue;
+        }
+
+        const next = lines[idx + 1];
+        if (next !== undefined && /^ {0,3}(=+|-+)\s*$/.test(next) &&
+            !/^\s{0,3}(>|\||[-*+]\s|\d{1,9}[.)]\s)/.test(line)) {
+          out.push('**' + escapeOutsideInlineCode(line.trim()) + '**');
+          idx++; // ข้ามบรรทัดขีดใต้
+          prevBlank = false;
+          continue;
+        }
+
+        out.push(escapeOutsideInlineCode(line));
+        prevBlank = false;
+      }
+
+      if (fenceChar) out.push(fenceChar.repeat(fenceLen));
+      return out.join('\n');
+    }
+
+    function wrapCodeFence(content, lang) {
+      const body = String(content == null ? '' : content);
+      const runs = body.match(/`+/g);
+      const maxLen = runs ? Math.max(...runs.map((r) => r.length)) : 0;
+      const fence = '`'.repeat(Math.max(3, maxLen + 1));
+      return fence + (lang || '') + '\n' + body + '\n' + fence;
+    }
+
+    function formatTimestamp(ts) {
+      if (ts === null || ts === undefined || ts === '') return '-';
+      const num = typeof ts === 'number' ? ts : (typeof ts === 'string' && /^\d+$/.test(ts) ? Number(ts) : ts);
+      const d = new Date(num);
+      if (isNaN(d.getTime())) return '-';
+      const pad = (n) => String(n).padStart(2, '0');
+      const offsetMin = -d.getTimezoneOffset();
+      const sign = offsetMin >= 0 ? '+' : '-';
+      const absMin = Math.abs(offsetMin);
+      const tz = sign + pad(Math.floor(absMin / 60)) + ':' + pad(absMin % 60);
+      return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+        ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()) +
+        ' (' + tz + ')';
+    }
+
+    function buildSafeFilename(topic) {
+      const cleaned = String(topic || '')
+        .replace(/[^\u0E00-\u0E7Fa-zA-Z0-9._-]+/g, '-')
+        .replace(/[.]+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 40)
+        .replace(/-+$/g, '');
+      const base = cleaned || 'goldfish-meeting';
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      const stamp = now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate());
+      return base + '-' + stamp + '.md';
+    }
+
+    function hasExportableData(opts) {
+      const options = opts || {};
+      const hasCoreData = (
+        state.rooms.team.length > 0 ||
+        state.rooms.muna.length > 0 ||
+        Boolean(state.meta.topic && state.meta.topic.trim())
+      );
+      const hasExtras = options.includeExtras !== false && (
+        state.tasks.length > 0 || Boolean(state.context.teamSummary)
+      );
+      return hasCoreData || hasExtras;
+    }
+
+    function formatMessageBodyMd(msg) {
+      const safe = escapeMdBody(msg.text);
+      if (msg.role === 'directive') {
+        const quoted = safe.split('\n').map((line) => '> ' + line).join('\n');
+        return '> **📌 กรอบประเด็นจาก Muna (Discussion Lead)**\n>\n' + quoted;
+      }
+      if (msg.role === 'handoff') {
+        const quoted = safe.split('\n').map((line) => '> ' + line).join('\n');
+        return '> **📥 Handoff — ' + escapeMdInline(msg.author) + '**\n>\n' + quoted;
+      }
+      return safe;
+    }
+
+    function buildExportMarkdown(opts) {
+      const options = Object.assign({ includeExtras: true, includePrompts: false }, opts);
+      const topicTitle = state.meta.topic ? escapeMdInline(state.meta.topic) : 'ยังไม่ระบุประเด็นหารือ';
+      const exportedAt = formatTimestamp(Date.now());
+      const modeLabel = state.meta.mode === 'bridge' ? 'Bridge (0฿)' : 'Demo';
+      const teamCount = state.rooms.team.length;
+      const munaCount = state.rooms.muna.length;
+      const doneTasks = state.tasks.filter((t) => t.done).length;
+
+      let bodyMd = '';
+
+      bodyMd += '## 1. ห้องหารือและวิเคราะห์ (Rin × Eve) <a id="sec-team"></a>\n\n';
+      if (teamCount === 0) {
+        bodyMd += '_ยังไม่มีข้อความในห้องนี้_\n\n';
+      } else {
+        state.rooms.team.forEach((m, idx) => {
+          const badge = m.role === 'directive' ? '📌 ' : '';
+          const timeStr = formatTimestamp(m.ts);
+          bodyMd += '### ' + (idx + 1) + '. ' + badge + escapeMdInline(m.author) + ' · ' + escapeMdInline(m.tag || '-') + ' (`' + timeStr + '`)\n\n';
+          bodyMd += formatMessageBodyMd(m) + '\n\n';
+        });
+      }
+
+      bodyMd += '## 2. ห้องสังเคราะห์และประสานงาน (Muna ↔ Project Owner) <a id="sec-muna"></a>\n\n';
+      if (munaCount === 0) {
+        bodyMd += '_ยังไม่มีข้อความในห้องนี้_\n\n';
+      } else {
+        state.rooms.muna.forEach((m, idx) => {
+          const timeStr = formatTimestamp(m.ts);
+          bodyMd += '### ' + (idx + 1) + '. ' + escapeMdInline(m.author) + ' · ' + escapeMdInline(m.tag || '-') + ' (`' + timeStr + '`)\n\n';
+          bodyMd += formatMessageBodyMd(m) + '\n\n';
+        });
+      }
+
+      const tocExtras = [];
+      if (options.includeExtras && state.context.teamSummary) {
+        tocExtras.push('- [3. สรุปบริบทก่อนหน้า (Rolling Summary)](#sec-summary)');
+        bodyMd += '## 3. สรุปบริบทก่อนหน้า (Rolling Summary) <a id="sec-summary"></a>\n\n';
+        bodyMd += escapeMdBody(state.context.teamSummary) + '\n\n';
+      }
+
+      if (options.includeExtras && state.tasks.length > 0) {
+        tocExtras.push('- [รายการงาน / Owner Decisions (Tasks)](#sec-tasks)');
+        bodyMd += '## รายการงาน / Owner Decisions (Tasks) <a id="sec-tasks"></a>\n\n';
+        state.tasks.forEach((t) => {
+          const timeStr = formatTimestamp(t.ts);
+          bodyMd += '- [' + (t.done ? 'x' : ' ') + '] ' + escapeMdInline(t.text) + ' _(' + timeStr + ')_\n';
+        });
+        bodyMd += '\n';
+      }
+
+      if (options.includePrompts) {
+        tocExtras.push('- [Meeting Rules & Role Prompts](#sec-prompts)');
+        bodyMd += '## Meeting Rules & Role Prompts <a id="sec-prompts"></a>\n\n';
+        bodyMd += '### Meeting Rules & Guiding Principle\n\n' + wrapCodeFence(state.prompts.meetingRules, 'text') + '\n\n';
+        bodyMd += '### Rin (ริน) — Operational Analyst\n\n' + wrapCodeFence(state.prompts.rin, 'text') + '\n\n';
+        bodyMd += '### Eve (อีฟ) — Structural Reviewer\n\n' + wrapCodeFence(state.prompts.eve, 'text') + '\n\n';
+        bodyMd += '### Muna (มูนา) — Discussion Lead & Synthesizer\n\n' + wrapCodeFence(state.prompts.muna, 'text') + '\n\n';
+      }
+
+      const TOKEN_PLACEHOLDER = '__TOKEN_EST__';
+      let headerMd = '# Goldfish Project — บันทึกการประชุม: ' + topicTitle + '\n\n';
+      headerMd += '## ข้อมูลการประชุม <a id="sec-meta"></a>\n\n';
+      headerMd += '| รายการ | รายละเอียด |\n';
+      headerMd += '| --- | --- |\n';
+      headerMd += '| ประเด็นหารือ | ' + topicTitle + ' |\n';
+      headerMd += '| วันที่ส่งออก | `' + exportedAt + '` |\n';
+      headerMd += '| โหมดการทำงาน | ' + modeLabel + ' |\n';
+      headerMd += '| รอบล่าสุด | รอบที่ ' + state.meta.round + ' |\n';
+      headerMd += '| ขั้นตอนการประชุม | `' + state.meta.stage + '` |\n';
+      headerMd += '| จำนวนข้อความ | ห้อง Rin × Eve ' + teamCount + ' ข้อความ · ห้อง Muna ↔ Owner ' + munaCount + ' ข้อความ |\n';
+      headerMd += '| รายการงาน (Tasks) | เสร็จแล้ว ' + doneTasks + ' / ' + state.tasks.length + ' รายการ |\n';
+      headerMd += '| ประมาณการ Token ทั้งไฟล์ | ~' + TOKEN_PLACEHOLDER + ' tokens |\n\n';
+
+      headerMd += '## สารบัญ\n\n';
+      headerMd += '- [ข้อมูลการประชุม](#sec-meta)\n';
+      headerMd += '- [1. ห้องหารือและวิเคราะห์ (Rin × Eve)](#sec-team)\n';
+      headerMd += '- [2. ห้องสังเคราะห์และประสานงาน (Muna ↔ Project Owner)](#sec-muna)\n';
+      if (tocExtras.length > 0) {
+        headerMd += tocExtras.join('\n') + '\n';
+      }
+      headerMd += '\n';
+
+      const pass1 = (headerMd + bodyMd).replace(TOKEN_PLACEHOLDER, '0');
+      const estPass1 = estimateTokens(pass1);
+      const pass2 = (headerMd + bodyMd).replace(TOKEN_PLACEHOLDER, String(estPass1));
+      const finalEst = estimateTokens(pass2);
+      return (headerMd + bodyMd).replace(TOKEN_PLACEHOLDER, finalEst.toLocaleString('th-TH'));
+    }
+
+    // ===== 10. Mode Badge & Mode Switching =====
+    function updateModeBadge(mode) {
+      if (mode === 'bridge') {
+        els.modeBadge.textContent = '🔗 Bridge 0฿';
+        els.modeBadge.className = 'mode-badge bridge';
+      } else {
+        els.modeBadge.textContent = '🎭 Demo';
+        els.modeBadge.className = 'mode-badge demo';
+      }
+    }
+
+    function setMode(newMode, skipSave) {
+      if (state.isRunning) return;
+      state.meta.mode = newMode;
+      const isBridge = newMode === 'bridge';
+
+      els.btnModeBridge.classList.toggle('active', isBridge);
+      els.btnModeDemo.classList.toggle('active', !isBridge);
+      els.btnModeBridge.setAttribute('aria-pressed', String(isBridge));
+      els.btnModeDemo.setAttribute('aria-pressed', String(!isBridge));
+      els.btnTeamNext.textContent = isBridge ? 'สลับไปอีกฝั่ง' : 'หารือต่ออีก 1 รอบ';
+      updateModeBadge(newMode);
+
+      if (!state.meta.topic) {
+        els.teamStatus.textContent = isBridge ? 'โหมดสะพานคัดลอก · พร้อมทำงาน' : 'โหมดจำลอง · พร้อมทำงาน';
+        els.btnTeamNext.disabled = true;
+        els.btnTeamNext.textContent = isBridge ? 'สลับไปอีกฝั่ง' : 'หารือต่ออีก 1 รอบ';
+      } else if (isBridge) {
+        updateTeamBridgeUI();
+      } else {
+        els.teamBridgePanel.classList.remove('show');
+        els.teamWaitNote.classList.remove('show');
+        els.teamStatus.textContent = 'โหมดจำลอง · รอบที่ ' + state.meta.round;
+        els.btnTeamNext.disabled = false;
+        els.btnTeamNext.textContent = 'หารือต่ออีก 1 รอบ';
+      }
+
+      if (isBridge) {
+        updateMunaBridgeUI();
+      } else {
+        els.munaBridgePanel.classList.remove('show');
+        els.munaWaitNote.classList.remove('show');
+        els.teamWaitNote.classList.remove('show');
+        els.munaStatus.textContent = 'โหมดจำลอง · คุยตรงกับ Muna ได้ทันที';
+      }
+      if (!skipSave) saveState();
+    }
+
+    // ===== 11. Task List Logic =====
+    function renderTasks() {
+      els.taskList.innerHTML = '';
+      const total = state.tasks.length;
+      const done = state.tasks.filter((t) => t.done).length;
+      const pending = total - done;
+      els.taskCount.textContent = total ? '(' + done + '/' + total + ')' : '';
+      els.btnTaskPanel.textContent = pending > 0 ? '📋 งาน (' + pending + ')' : '📋 งาน';
+      els.btnTaskPanel.setAttribute('aria-label', pending > 0 ? 'รายการงาน — มีงานค้าง ' + pending + ' รายการ' : 'รายการงาน');
+
+      if (total === 0) {
+        els.taskList.innerHTML = '<p style="color:var(--muted);font-size:13px;text-align:center;margin:auto;">ยังไม่มีงาน — เพิ่มด้านล่าง</p>';
+        return;
+      }
+      state.tasks.forEach((task) => {
+        const item = document.createElement('div');
+        item.className = 'task-item' + (task.done ? ' done' : '');
+
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.className = 'task-check';
+        cb.checked = task.done;
+        cb.setAttribute('aria-label', 'ทำเครื่องหมายเสร็จสำหรับ: ' + task.text);
+        cb.addEventListener('change', () => {
+          task.done = cb.checked;
+          saveState();
+          renderTasks();
+        });
+
+        const label = document.createElement('span');
+        label.className = 'task-text';
+        label.textContent = task.text;
+
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'task-del';
+        del.textContent = '✕';
+        del.title = 'ลบงานนี้';
+        del.setAttribute('aria-label', 'ลบงาน: ' + task.text);
+        del.addEventListener('click', () => {
+          state.tasks = state.tasks.filter((t) => t.id !== task.id);
+          saveState();
+          renderTasks();
+        });
+
+        item.appendChild(cb);
+        item.appendChild(label);
+        item.appendChild(del);
+        els.taskList.appendChild(item);
+      });
+    }
+
+    function addTask(text) {
+      if (!text.trim()) return;
+      state.tasks.push({ id: makeId(), text: text.trim(), done: false, ts: Date.now() });
+      saveState();
+      renderTasks();
+    }
+
+    function closeTaskPanel(restoreFocus) {
+      els.taskPanel.classList.remove('open');
+      els.btnTaskPanel.setAttribute('aria-expanded', 'false');
+      if (restoreFocus) els.btnTaskPanel.focus();
+    }
+
+    function closePromptModal(restoreFocus) {
+      els.promptModal.classList.remove('open');
+      if (restoreFocus) els.btnOpenPrompts.focus();
+    }
+
+    function closeExportModal(restoreFocus) {
+      els.exportModal.classList.remove('open');
+      if (restoreFocus) els.btnDownloadMd.focus();
+    }
+
+    function trapFocus(container) {
+      container.addEventListener('keydown', (e) => {
+        if (e.key !== 'Tab') return;
+        const focusable = Array.from(container.querySelectorAll(
+          'button:not(:disabled), [href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), summary, [tabindex]:not([tabindex="-1"])'
+        )).filter((el) => el.offsetParent !== null);
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      });
+    }
+
+    trapFocus(els.promptModal);
+    trapFocus(els.exportModal);
+    trapFocus(els.taskPanel);
+
+    // ===== 12. ผูกเหตุการณ์ปุ่มกดและคีย์ลัด =====
+    els.btnTaskPanel.addEventListener('click', () => {
+      const isOpen = els.taskPanel.classList.toggle('open');
+      els.btnTaskPanel.setAttribute('aria-expanded', String(isOpen));
+      if (isOpen) els.taskInput.focus();
+    });
+
+    els.btnCloseTask.addEventListener('click', () => closeTaskPanel(true));
+
+    els.btnClearDone.addEventListener('click', () => {
+      const before = state.tasks.length;
+      state.tasks = state.tasks.filter((t) => !t.done);
+      if (state.tasks.length === before) {
+        showToast('ยังไม่มีงานที่ทำเสร็จแล้ว');
+        return;
+      }
+      saveState();
+      renderTasks();
+      showToast('ลบงานที่เสร็จแล้ว');
+    });
+
+    els.btnAddTask.addEventListener('click', () => {
+      addTask(els.taskInput.value);
+      els.taskInput.value = '';
+      els.taskInput.focus();
+    });
+
+    els.taskInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        addTask(els.taskInput.value);
+        els.taskInput.value = '';
+      }
+    });
+
+    els.btnModeBridge.addEventListener('click', () => setMode('bridge'));
+    els.btnModeDemo.addEventListener('click', () => setMode('demo'));
+
+    // Modal กติกา & บทบาท
+    els.btnOpenPrompts.addEventListener('click', () => {
+      els.inputMeetingRules.value = state.prompts.meetingRules;
+      els.inputPromptRin.value = state.prompts.rin;
+      els.inputPromptEve.value = state.prompts.eve;
+      els.inputPromptMuna.value = state.prompts.muna;
+      els.promptModal.classList.add('open');
+      els.inputMeetingRules.focus();
+    });
+
+    els.btnClosePrompts.addEventListener('click', () => closePromptModal(true));
+    els.promptModal.addEventListener('click', (e) => {
+      if (e.target === els.promptModal) closePromptModal(true);
+    });
+
+    // Global Keyboard Shortcuts (Escape ปิด Modal + Ctrl/Cmd+Shift+E เปิด Export)
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'e') {
+        e.preventDefault();
+        els.btnDownloadMd.click();
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'n') {
+        e.preventDefault();
+        if (!els.btnTeamNext.disabled) els.btnTeamNext.click();
+        return;
+      }
+      if (e.key !== 'Escape') return;
+      if (els.exportModal.classList.contains('open')) {
+        closeExportModal(true);
+      } else if (els.promptModal.classList.contains('open')) {
+        closePromptModal(true);
+      } else if (els.taskPanel.classList.contains('open')) {
+        closeTaskPanel(true);
+      }
+    });
+
+    els.btnResetPrompts.addEventListener('click', () => {
+      els.inputMeetingRules.value = DEFAULT_PROMPTS.meetingRules;
+      els.inputPromptRin.value = DEFAULT_PROMPTS.rin;
+      els.inputPromptEve.value = DEFAULT_PROMPTS.eve;
+      els.inputPromptMuna.value = DEFAULT_PROMPTS.muna;
+      showToast('คืนค่ากติกาและบทบาทเริ่มต้นในช่องแล้ว (กดบันทึกเพื่อยืนยัน)');
+    });
+
+    els.btnSavePrompts.addEventListener('click', () => {
+      state.prompts.meetingRules = els.inputMeetingRules.value.trim() || DEFAULT_PROMPTS.meetingRules;
+      state.prompts.rin = els.inputPromptRin.value.trim() || DEFAULT_PROMPTS.rin;
+      state.prompts.eve = els.inputPromptEve.value.trim() || DEFAULT_PROMPTS.eve;
+      state.prompts.muna = els.inputPromptMuna.value.trim() || DEFAULT_PROMPTS.muna;
+      saveState();
+      updateTeamBridgeUI();
+      updateMunaBridgeUI();
+      closePromptModal(true);
+      showToast('บันทึกกติกาและบทบาท Goldfish Project แล้ว');
+    });
+
+    // คลิกเลือก Rin / Eve บนแถบฝั่งซ้าย
+    els.teamPills.forEach((pill) => {
+      pill.addEventListener('click', () => {
+        const idx = Number(pill.getAttribute('data-turn'));
+        state.meta.teamTurn = idx;
+        if (state.meta.topic) {
+          state.meta.stage = idx === 0 ? 'wait_rin' : 'wait_eve';
+        }
+        updateTeamBridgeUI();
+        updateMunaBridgeUI();
+        saveState();
+        if (state.meta.mode === 'bridge' && state.meta.topic) {
+          showToast('สลับคิวฝั่งซ้ายเป็น ' + TEAM_META[idx].name + ' แล้ว (คำตอบจะส่งให้ Muna)');
+        }
+      });
+    });
+
+    // ฟอร์มฝั่งซ้าย (เปิดประเด็นหารือ / แทรกข้อมูล)
+    els.topicForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const text = els.topicInput.value.trim();
+      if (!text || state.isRunning) return;
+
+      const isFirst = !state.meta.topic;
+      if (isFirst) state.meta.topic = text;
+
+      const msg = {
+        id: makeId(),
+        role: 'owner',
+        author: 'Project Owner (ประเด็นหารือ)',
+        tag: isFirst ? 'ประเด็นหลัก' : 'ข้อมูลเพิ่ม',
+        text,
+        ts: Date.now()
+      };
+      recordTeamMessage(msg);
+      els.topicInput.value = '';
+
+      if (state.meta.mode === 'bridge') {
+        if (isFirst) {
+          state.meta.round = 1;
+          state.meta.teamTurn = 0;
+          els.btnSendTopic.textContent = 'แทรกข้อมูลเพิ่ม';
+        }
+        // Lead-First: ส่งประเด็นให้ Muna (Discussion Lead) เปิดกรอบการประชุมก่อนทุกครั้ง
+        state.meta.stage = 'lead_open';
+        state.drafts.pendingOwnerPrompt = 'Project Owner เปิดประเด็นหารือ: "' + text + '" — กรุณาในฐานะ Discussion Lead กำหนดกรอบประเด็นและคำถามแรกเพื่อส่งต่อให้ Rin (Operational Analyst) วิเคราะห์ครับ';
+        const leadNotice = {
+          id: makeId(),
+          role: 'owner',
+          author: 'Project Owner → Muna',
+          tag: 'เปิดประเด็น',
+          text: 'ส่งประเด็น "' + text + '" ให้ Muna เปิดกรอบการประชุมก่อนส่งต่อให้ Rin',
+          ts: Date.now()
+        };
+        state.rooms.muna.push(leadNotice);
+        appendMunaMessage(leadNotice);
+        updateTeamBridgeUI();
+        updateMunaBridgeUI();
+        saveState();
+        showToast('ส่งประเด็นให้ Muna (Discussion Lead) เปิดกรอบที่ฝั่งขวาแล้ว');
+      } else {
+        saveState();
+        runDemoTeamRound(isFirst ? '' : text);
+      }
+    });
+
+    // ปุ่มสะพานคัดลอกฝั่งซ้าย (Rin / Eve)
+    els.btnToggleTeamPrompt.addEventListener('click', () => {
+      const open = els.teamPromptPreview.classList.toggle('open');
+      els.btnToggleTeamPrompt.textContent = open ? 'ซ่อนพรอมต์' : 'ดูพรอมต์';
+      els.btnToggleTeamPrompt.setAttribute('aria-expanded', String(open));
+    });
+
+    els.btnCopyTeamPrompt.addEventListener('click', () => {
+      const persona = TEAM_META[state.meta.teamTurn];
+      copyText(buildTeamPrompt(), 'คัดลอกพรอมต์ ' + persona.name + ' (พร้อมกติกา Goldfish) แล้ว!');
+    });
+
+    function submitTeamReply() {
+      const reply = els.teamReplyInput.value.trim();
+      if (!reply) {
+        showToast('กรุณาวางคำตอบก่อนกดบันทึกครับ');
+        return;
+      }
+      const persona = TEAM_META[state.meta.teamTurn];
+      const msg = {
+        id: makeId(),
+        role: persona.role,
+        author: persona.label,
+        tag: 'รอบที่ ' + state.meta.round,
+        text: reply,
+        ts: Date.now()
+      };
+      recordTeamMessage(msg);
+      els.teamReplyInput.value = '';
+
+      // Lead-First: ทุกครั้งที่ Rin หรือ Eve ตอบ ต้องส่งคำตอบให้ Muna (Discussion Lead) ก่อนเสมอ
+      const handoffMsg = {
+        id: makeId(),
+        role: 'handoff',
+        author: '📥 ' + persona.name + ' ส่งคำตอบให้ Muna',
+        tag: 'รอบที่ ' + state.meta.round,
+        text: reply,
+        ts: Date.now()
+      };
+      state.rooms.muna.push(handoffMsg);
+      appendMunaMessage(handoffMsg);
+
+      if (persona.role === 'rin') {
+        state.meta.teamTurn = 1;
+        state.meta.stage = 'lead_review_rin';
+        state.drafts.pendingOwnerPrompt = 'Rin (Operational Analyst) ส่งคำตอบมาให้คุณแล้ว กรุณาตรวจรับ จับประเด็นสำคัญ และกำหนดกรอบคำถามส่งต่อให้ Eve (Structural Reviewer) ทบทวนเชิงโครงสร้างครับ';
+      } else {
+        state.meta.teamTurn = 0;
+        state.meta.stage = 'lead_synthesize';
+        state.drafts.pendingOwnerPrompt = 'Eve (Structural Reviewer) ส่งผลการทบทวนมาให้คุณแล้ว กรุณาสังเคราะห์คำตอบของทั้ง Rin และ Eve เป็น Meeting Output 7 หัวข้อ เพื่อเสนอ Project Owner ครับ';
+      }
+
+      updateTeamBridgeUI();
+      updateMunaBridgeUI();
+      saveState();
+      showToast('ส่งคำตอบของ ' + persona.name + ' ให้ Muna (Discussion Lead) ที่ฝั่งขวาแล้ว');
+    }
+
+    els.btnSaveTeamReply.addEventListener('click', submitTeamReply);
+    els.teamReplyInput.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        submitTeamReply();
+      }
+    });
+
+    els.btnTeamNext.addEventListener('click', () => {
+      if (!state.meta.topic) return;
+      if (state.meta.mode === 'bridge') {
+        const canSwitch = state.meta.stage === 'wait_rin' || state.meta.stage === 'wait_eve';
+        if (!canSwitch) {
+          showToast('ยังสลับคิวไม่ได้ครับ — รอ Muna (Discussion Lead) ดำเนินการที่ฝั่งขวาก่อน');
+          return;
+        }
+        advanceTeamTurn();
+        showToast('สลับคิวเป็น ' + TEAM_META[state.meta.teamTurn].name + ' แล้ว');
+      } else {
+        runDemoTeamRound('');
+      }
+    });
+
+    // ฟอร์มฝั่งขวา (Project Owner คุยตรงกับ Muna)
+    function sendOwnerToMuna(text) {
+      if (!text) return;
+      const msg = {
+        id: makeId(),
+        role: 'owner',
+        author: 'Project Owner (คุณ)',
+        tag: 'ถึง Muna',
+        text,
+        ts: Date.now()
+      };
+      state.rooms.muna.push(msg);
+      appendMunaMessage(msg);
+      state.drafts.pendingOwnerPrompt = text;
+      saveState();
+
+      if (state.meta.mode === 'bridge') {
+        updateMunaBridgeUI();
+        showToast('สร้างพรอมต์ Muna (พร้อมแชท Rin × Eve ล่าสุด) แล้ว');
+      } else {
+        runDemoMunaReply(text);
+      }
+    }
+
+    els.munaForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const text = els.munaInput.value.trim();
+      if (!text) return;
+      els.munaInput.value = '';
+      sendOwnerToMuna(text);
+    });
+
+    document.querySelectorAll('.muna-quick-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        sendOwnerToMuna(btn.getAttribute('data-prompt'));
+      });
+    });
+
+    // ปุ่มสะพานคัดลอกฝั่งขวา (Muna)
+    els.btnToggleMunaPrompt.addEventListener('click', () => {
+      const open = els.munaPromptPreview.classList.toggle('open');
+      els.btnToggleMunaPrompt.textContent = open ? 'ซ่อนพรอมต์' : 'ดูพรอมต์';
+      els.btnToggleMunaPrompt.setAttribute('aria-expanded', String(open));
+    });
+
+    els.btnCopyMunaPrompt.addEventListener('click', () => {
+      copyText(buildMunaPrompt(), 'คัดลอกพรอมต์ Muna (พร้อมแชท Rin × Eve ล่าสุด) แล้ว!');
+    });
+
+    function submitMunaReply() {
+      const reply = els.munaReplyInput.value.trim();
+      if (!reply) {
+        showToast('กรุณาวางคำตอบจาก Muna ก่อนกดบันทึกครับ');
+        return;
+      }
+      const msg = {
+        id: makeId(),
+        role: 'muna',
+        author: MUNA_META.label,
+        tag: 'รอบที่ ' + (state.meta.round || 1),
+        text: reply,
+        ts: Date.now()
+      };
+      state.rooms.muna.push(msg);
+      appendMunaMessage(msg);
+      els.munaReplyInput.value = '';
+      state.drafts.pendingOwnerPrompt = '';
+
+      // Lead-First: Muna ส่งกรอบประเด็นต่อไปยัง Rin หรือ Eve หรือจบรอบเสนอ Project Owner
+      if (state.meta.stage === 'lead_open') {
+        recordTeamMessage({
+          id: makeId(),
+          role: 'directive',
+          author: 'กรอบประเด็นจาก Muna → Rin',
+          tag: 'รอบที่ ' + state.meta.round,
+          text: reply,
+          ts: Date.now()
+        });
+        state.meta.teamTurn = 0;
+        state.meta.stage = 'wait_rin';
+        els.munaStatus.textContent = 'Muna ส่งกรอบให้ Rin แล้ว';
+        showToast('Muna ส่งกรอบประเด็นให้ Rin ที่ฝั่งซ้ายแล้ว');
+      } else if (state.meta.stage === 'lead_review_rin') {
+        recordTeamMessage({
+          id: makeId(),
+          role: 'directive',
+          author: 'กรอบประเด็นจาก Muna → Eve',
+          tag: 'รอบที่ ' + state.meta.round,
+          text: reply,
+          ts: Date.now()
+        });
+        state.meta.teamTurn = 1;
+        state.meta.stage = 'wait_eve';
+        els.munaStatus.textContent = 'Muna ส่งกรอบต่อให้ Eve แล้ว';
+        showToast('Muna ส่งกรอบประเด็นต่อให้ Eve ที่ฝั่งซ้ายแล้ว');
+      } else if (state.meta.stage === 'lead_synthesize') {
+        state.meta.stage = 'done_round';
+        state.meta.round += 1;
+        els.munaStatus.textContent = 'Muna สังเคราะห์ 7 หัวข้อเสนอ Project Owner แล้ว';
+        showToast('Muna สังเคราะห์จบรอบแล้ว (พร้อมรับการตัดสินใจจาก Owner)');
+      } else {
+        els.munaStatus.textContent = 'บันทึกบทสรุปจาก Muna แล้ว';
+        showToast('บันทึกคำตอบ Muna แล้ว (กดส่งกรอบประเด็นไปห้องซ้ายได้)');
+      }
+
+      updateTeamBridgeUI();
+      updateMunaBridgeUI();
+      saveState();
+    }
+
+    els.btnSaveMunaReply.addEventListener('click', submitMunaReply);
+    els.munaReplyInput.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        submitMunaReply();
+      }
+    });
+
+    // ปุ่มประเด็นตัวอย่าง
+    document.querySelectorAll('.sample-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        els.topicInput.value = btn.getAttribute('data-topic');
+        els.topicForm.dispatchEvent(new Event('submit'));
+      });
+    });
+
+    // ส่งออก .md
+    function getExportOptions() {
+      return {
+        includeExtras: els.chkExportExtras.checked,
+        includePrompts: els.chkExportPrompts.checked
+      };
+    }
+
+    function refreshExportPreviewMeta() {
+      const opts = getExportOptions();
+      const md = buildExportMarkdown(opts);
+      const filename = buildSafeFilename(state.meta.topic);
+      const tok = estimateTokens(md);
+      els.exportMetaSummary.textContent =
+        'ไฟล์: ' + filename + ' · ~' + tok.toLocaleString('th-TH') + ' tokens · ' +
+        (state.rooms.team.length + state.rooms.muna.length) + ' ข้อความ';
+      const allLines = md.split('\n');
+      els.exportPreviewMd.textContent = allLines.slice(0, 10).join('\n') + (allLines.length > 10 ? '\n...' : '');
+    }
+
+    els.exportPreviewDetails.addEventListener('toggle', () => {
+      els.exportPreviewDetails.setAttribute('aria-expanded', String(els.exportPreviewDetails.open));
+    });
+
+    els.btnDownloadMd.addEventListener('click', () => {
+      refreshExportPreviewMeta();
+      refreshBackupList();
+      els.exportModal.classList.add('open');
+      els.btnConfirmDownloadMd.focus();
+    });
+
+    function onExportPrefChange() {
+      state.prefs.exportIncludeExtras = els.chkExportExtras.checked;
+      state.prefs.exportIncludePrompts = els.chkExportPrompts.checked;
+      saveState();
+      refreshExportPreviewMeta();
+    }
+
+    els.chkExportExtras.addEventListener('change', onExportPrefChange);
+    els.chkExportPrompts.addEventListener('change', onExportPrefChange);
+    els.btnCloseExport.addEventListener('click', () => closeExportModal(true));
+    els.exportModal.addEventListener('click', (e) => {
+      if (e.target === els.exportModal) closeExportModal(true);
+    });
+
+    els.btnCopyExportMd.addEventListener('click', () => {
+      const opts = getExportOptions();
+      if (!hasExportableData(opts)) {
+        showToast('ยังไม่มีข้อมูลการประชุมหรืองานสำหรับส่งออก');
+        return;
+      }
+      copyText(buildExportMarkdown(opts), 'คัดลอกบันทึกการประชุม (.md) แล้ว');
+      closeExportModal(true);
+    });
+
+    els.btnConfirmDownloadMd.addEventListener('click', () => {
+      const opts = getExportOptions();
+      if (!hasExportableData(opts)) {
+        showToast('ยังไม่มีข้อมูลการประชุมหรืองานสำหรับส่งออก');
+        return;
+      }
+      const md = buildExportMarkdown(opts);
+      const filename = buildSafeFilename(state.meta.topic);
+      const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      closeExportModal(true);
+      showToast('ดาวน์โหลด ' + filename + ' แล้ว');
+    });
+
+    // เริ่มใหม่ (ล้างห้องประชุมแต่คงค่ากติกา บทบาท และ Tasks ไว้)
+    els.btnReset.addEventListener('click', () => {
+      const hasMeetingData = state.rooms.team.length > 0 || state.rooms.muna.length > 0 || Boolean(state.meta.topic);
+      if (hasMeetingData && !window.confirm(
+        'ต้องการเริ่มใหม่หรือไม่?\n\n' +
+        '• ข้อความในห้อง Rin × Eve และห้อง Muna จะถูกลบทั้งหมด\n' +
+        '• กติกา บทบาท และรายการงานจะยังอยู่\n\n' +
+        'ถ้ายังไม่ได้เก็บบันทึก ให้กด "ยกเลิก" แล้วส่งออก .md ก่อน'
+      )) return;
+      state.timers.forEach((id) => clearTimeout(id));
+      state.timers = [];
+      state.meta.topic = '';
+      state.meta.round = 0;
+      state.meta.teamTurn = 0;
+      state.meta.stage = 'idle';
+      state.isRunning = false;
+      state.rooms.team = [];
+      state.rooms.muna = [];
+      state.drafts.pendingOwnerPrompt = '';
+      state.context.teamSummary = '';
+      state.context.summarizedUpTo = 0;
+
+      els.teamChatList.innerHTML = '';
+      els.teamChatList.appendChild(els.teamEmpty);
+      els.teamEmpty.style.display = 'block';
+      els.teamBridgePanel.classList.remove('show');
+      els.teamPromptPreview.classList.remove('open');
+      els.btnToggleTeamPrompt.textContent = 'ดูพรอมต์';
+      els.btnToggleTeamPrompt.setAttribute('aria-expanded', 'false');
+      els.teamReplyInput.value = '';
+      els.btnSendTopic.disabled = false;
+      els.btnSendTopic.textContent = 'เปิดประเด็นหารือ';
+      els.btnTeamNext.disabled = true;
+      els.btnTeamNext.textContent = state.meta.mode === 'bridge' ? 'สลับไปอีกฝั่ง' : 'หารือต่ออีก 1 รอบ';
+      els.teamRoundInfo.textContent = 'ยังไม่เริ่มรอบ';
+      els.topicDisplay.textContent = 'ยังไม่ได้ตั้งประเด็นหารือ';
+      els.teamStatus.textContent = state.meta.mode === 'bridge' ? 'โหมดสะพานคัดลอก · พร้อมทำงาน' : 'โหมดจำลอง · พร้อมทำงาน';
+
+      els.munaChatList.innerHTML = '';
+      els.munaChatList.appendChild(els.munaEmpty);
+      els.munaEmpty.style.display = 'block';
+      els.munaBridgePanel.classList.remove('show');
+      els.munaWaitNote.classList.remove('show');
+      els.teamWaitNote.classList.remove('show');
+      els.munaPromptPreview.classList.remove('open');
+      els.btnToggleMunaPrompt.textContent = 'ดูพรอมต์';
+      els.btnToggleMunaPrompt.setAttribute('aria-expanded', 'false');
+      els.munaReplyInput.value = '';
+      els.munaStatus.textContent = 'พร้อมประสานงานกับ Project Owner';
+      els.syncCount.textContent = 'เห็นแชทฝั่งซ้าย 0 ข้อความ';
+
+      updateTeamBridgeUI();
+      saveState();
+      showToast('ล้างห้องประชุมแล้ว (ยังคงกติกา บทบาท และงานเดิมไว้)');
+    });
+
+    // แท็บสลับหน้าจอบนมือถือ
+    els.tabTeam.addEventListener('click', () => {
+      els.paneTeam.classList.remove('hidden-mobile');
+      els.paneMuna.classList.add('hidden-mobile');
+      els.tabTeam.classList.add('active');
+      els.tabMuna.classList.remove('active');
+      els.tabTeam.setAttribute('aria-selected', 'true');
+      els.tabMuna.setAttribute('aria-selected', 'false');
+    });
+
+    els.tabMuna.addEventListener('click', () => {
+      els.paneMuna.classList.remove('hidden-mobile');
+      els.paneTeam.classList.add('hidden-mobile');
+      els.tabMuna.classList.add('active');
+      els.tabTeam.classList.remove('active');
+      els.tabMuna.setAttribute('aria-selected', 'true');
+      els.tabTeam.setAttribute('aria-selected', 'false');
+    });
+
+    // ===== 12b. สำรอง / กู้คืนทั้งแอป (JSON) =====
+    function buildBackupJson() {
+      return JSON.stringify(
+        Object.assign({ appVersion: APP_VERSION, exportedAt: new Date().toISOString() }, buildPayloadObject()),
+        null,
+        2
+      );
+    }
+
+    function buildBackupFilename() {
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      return 'goldfish-backup-' + now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate()) +
+        '-' + pad(now.getHours()) + pad(now.getMinutes()) + '.json';
+    }
+
+    function hasCurrentData() {
+      return state.rooms.team.length > 0 || state.rooms.muna.length > 0 ||
+        state.tasks.length > 0 || Boolean(state.meta.topic);
+    }
+
+    function summarizeBackup(parsed, res, sourceLabel) {
+      const d = res.data;
+      const customPrompts = Object.keys(DEFAULT_PROMPTS).some((k) => d.prompts[k] !== DEFAULT_PROMPTS[k]);
+      const topic = d.meta.topic ? (d.meta.topic.length > 80 ? d.meta.topic.slice(0, 80) + '…' : d.meta.topic) : '(ไม่มี)';
+      return (
+        'กู้คืนข้อมูลจาก ' + sourceLabel + '\n\n' +
+        '• แอปเวอร์ชัน: ' + asText(parsed.appVersion, 'ไม่ระบุ') + '\n' +
+        '• สำรองเมื่อ: ' + (parsed.exportedAt ? formatTimestamp(parsed.exportedAt) : 'ไม่ระบุ') + '\n' +
+        '• ประเด็น: ' + topic + '\n' +
+        '• ข้อความ Rin × Eve: ' + d.rooms.team.length + ' · ห้อง Muna: ' + d.rooms.muna.length + ' · งาน: ' + d.tasks.length + '\n' +
+        '• กติกาและบทบาท: ' + (customPrompts ? 'ปรับแต่งเอง (จะถูกใส่ในพรอมต์ที่คัดลอกไปให้ LLM)' : 'ค่าเริ่มต้น') + '\n' +
+        (res.dropped > 0 ? '• ข้ามรายการที่เสียหาย ' + res.dropped + ' รายการ\n' : '') +
+        '\n' +
+        (hasCurrentData()
+          ? 'ข้อมูลปัจจุบันจะถูกสำรองอัตโนมัติก่อนทับ\n\n'
+          : 'ข้อมูลปัจจุบันว่างเปล่า\n\n') +
+        'ดำเนินการต่อหรือไม่?'
+      );
+    }
+
+    function restoreFromText(text, sourceLabel) {
+      if (state.isRunning) {
+        showToast('รอให้โหมดจำลองทำงานจบก่อนจึงจะกู้คืนได้');
+        return false;
+      }
+      let parsed;
+      try {
+        parsed = JSON.parse(text);
+      } catch (e) {
+        showToast('⚠️ ไฟล์ไม่ใช่ JSON ที่ถูกต้อง', 7000);
+        return false;
+      }
+      const res = normalizePayload(parsed);
+      if (!res.ok) {
+        const found = typeof res.found === 'number' || typeof res.found === 'string' ? String(res.found) : '?';
+        showToast(
+          res.reason === 'schema'
+            ? '⚠️ กู้คืนไม่ได้: ไฟล์เป็น schema v' + found + ' แต่แอปรองรับ v' + SCHEMA_VERSION
+            : '⚠️ กู้คืนไม่ได้: โครงสร้างไฟล์ไม่ถูกต้อง',
+          8000
+        );
+        return false;
+      }
+      if (!window.confirm(summarizeBackup(parsed, res, sourceLabel))) return false;
+
+      let savedKey = '';
+      if (hasCurrentData()) {
+        savedKey = writeBackup(JSON.stringify(buildPayloadObject()));
+        if (!savedKey && !window.confirm(
+          'สำรองข้อมูลปัจจุบันอัตโนมัติไม่สำเร็จ (พื้นที่เก็บข้อมูลอาจเต็ม)\n\n' +
+          'ดำเนินการกู้คืนต่อโดยไม่มีชุดสำรองหรือไม่?'
+        )) return false;
+      }
+
+      state.timers.forEach((id) => clearTimeout(id));
+      state.timers = [];
+      applyNormalized(res.data);
+      saveState();
+      renderAll();
+      showToast('กู้คืนข้อมูลแล้ว' + (savedKey ? ' · ข้อมูลเดิมสำรองไว้ที่ ' + savedKey : ''), 7000);
+      return true;
+    }
+
+    function refreshBackupList() {
+      const keys = listBackupKeys();
+      els.autoBackupRow.hidden = keys.length === 0;
+      els.selectAutoBackup.innerHTML = '';
+      keys.forEach((key) => {
+        let kb = '?';
+        try { kb = Math.max(1, Math.round((localStorage.getItem(key) || '').length / 1024)); } catch (e) { /* ignore */ }
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = formatTimestamp(Number(key.slice(BACKUP_PREFIX.length))) + ' · ' + kb + ' KB';
+        els.selectAutoBackup.appendChild(opt);
+      });
+    }
+
+    els.btnBackupJson.addEventListener('click', () => {
+      const blob = new Blob([buildBackupJson()], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const filename = buildBackupFilename();
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('ดาวน์โหลด ' + filename + ' แล้ว');
+    });
+
+    els.btnRestoreJson.addEventListener('click', () => els.inputRestoreJson.click());
+
+    els.inputRestoreJson.addEventListener('change', () => {
+      const file = els.inputRestoreJson.files && els.inputRestoreJson.files[0];
+      els.inputRestoreJson.value = '';
+      if (!file) return;
+      if (file.size > MAX_RESTORE_BYTES) {
+        showToast('⚠️ ไฟล์ใหญ่เกิน 5 MB — ไม่ใช่ไฟล์สำรองของแอปนี้', 7000);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (restoreFromText(String(reader.result || ''), 'ไฟล์ ' + file.name)) closeExportModal(true);
+      };
+      reader.onerror = () => showToast('⚠️ อ่านไฟล์ไม่สำเร็จ', 6000);
+      reader.readAsText(file);
+    });
+
+    els.btnRestoreAutoBackup.addEventListener('click', () => {
+      const key = els.selectAutoBackup.value;
+      if (!key) return;
+      let raw = null;
+      try { raw = localStorage.getItem(key); } catch (e) { raw = null; }
+      if (!raw) {
+        showToast('⚠️ อ่านชุดสำรองนี้ไม่ได้', 6000);
+        refreshBackupList();
+        return;
+      }
+      const label = els.selectAutoBackup.options[els.selectAutoBackup.selectedIndex].textContent;
+      if (restoreFromText(raw, 'ชุดสำรองอัตโนมัติ ' + label)) closeExportModal(true);
+    });
+
+    // ===== 13. กู้คืนข้อมูลจาก localStorage เมื่อเปิดหน้าเว็บ =====
+    // วาด UI ทั้งหมดจาก state ปัจจุบัน (ใช้ทั้งตอนเปิดแอปและหลัง Restore)
+    function renderAll() {
+      els.versionBadge.textContent = APP_VERSION;
+
+      els.teamChatList.innerHTML = '';
+      els.teamChatList.appendChild(els.teamEmpty);
+      els.teamEmpty.style.display = 'block';
+      els.munaChatList.innerHTML = '';
+      els.munaChatList.appendChild(els.munaEmpty);
+      els.munaEmpty.style.display = 'block';
+      els.syncCount.textContent = 'เห็นแชทฝั่งซ้าย ' + state.rooms.team.length + ' ข้อความ';
+      state.rooms.team.forEach((m) => appendTeamMessage(m));
+      state.rooms.muna.forEach((m) => appendMunaMessage(m));
+
+      els.teamReplyInput.value = '';
+      els.munaReplyInput.value = '';
+      els.teamPromptPreview.classList.remove('open');
+      els.munaPromptPreview.classList.remove('open');
+      els.btnToggleTeamPrompt.textContent = 'ดูพรอมต์';
+      els.btnToggleMunaPrompt.textContent = 'ดูพรอมต์';
+      els.btnToggleTeamPrompt.setAttribute('aria-expanded', 'false');
+      els.btnToggleMunaPrompt.setAttribute('aria-expanded', 'false');
+      els.munaStatus.textContent = 'พร้อมประสานงานกับ Project Owner';
+      els.btnSendTopic.disabled = false;
+
+      if (state.meta.topic) {
+        els.topicDisplay.textContent = 'ประเด็น: ' + state.meta.topic;
+        els.teamRoundInfo.textContent = 'รอบที่ ' + state.meta.round;
+        els.btnSendTopic.textContent = 'แทรกข้อมูลเพิ่ม';
+        els.btnTeamNext.disabled = false;
+      } else {
+        els.topicDisplay.textContent = 'ยังไม่ได้ตั้งประเด็นหารือ';
+        els.teamRoundInfo.textContent = 'ยังไม่เริ่มรอบ';
+        els.btnSendTopic.textContent = 'เปิดประเด็นหารือ';
+        els.btnTeamNext.disabled = true;
+      }
+
+      els.chkExportExtras.checked = state.prefs.exportIncludeExtras;
+      els.chkExportPrompts.checked = state.prefs.exportIncludePrompts;
+      renderTasks();
+      setMode(state.meta.mode, true);
+      updateTeamBridgeUI();
+      updateMunaBridgeUI();
+    }
+
+    function hydrateUI() {
+      const restored = loadState();
+      if (restored && syncTeamContextSummary()) saveState();
+      renderAll();
+
+      if (loadIssue) {
+        const note = loadBackupKey ? ' · ฉบับเดิมสำรองไว้ที่ localStorage คีย์ ' + loadBackupKey : '';
+        const msgs = {
+          storage: '⚠️ เข้าถึง localStorage ไม่ได้ — ข้อมูลจะไม่ถูกบันทึกในเซสชันนี้',
+          schema: '⚠️ ข้อมูลเดิมเป็นเวอร์ชันที่ไม่รองรับ — เริ่มห้องว่าง' + note,
+          corrupt: '⚠️ อ่านข้อมูลเดิมไม่ได้ — เริ่มห้องว่าง' + note,
+          partial: '⚠️ ข้ามข้อมูลที่เสียหาย ' + loadDropped + ' รายการ' + note
+        };
+        showToast(msgs[loadIssue] || '', 9000);
+      }
+    }
+
+    window.addEventListener('beforeunload', () => {
+      state.timers.forEach((id) => clearTimeout(id));
+      state.timers = [];
+      if (toastTimer) clearTimeout(toastTimer);
+    });
+
+    hydrateUI();
+  </script>
+</body>
+</html>
