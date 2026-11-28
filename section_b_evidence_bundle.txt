@@ -1,0 +1,76 @@
+=== B1 & B2: HARNESS GIT (LIVE CHECK) ===
+2026-11-28 12:48:09 +0700
+/Users/solargaria/All_Projects/goldfish-test-harness
+origin	https://github.com/solargaria/Goldfish-Test-Harness.git (fetch)
+origin	https://github.com/solargaria/Goldfish-Test-Harness.git (push)
+75f5f33 chore: initialize isolated test harness
+?? evidence/
+  origin/HEAD -> origin/main
+  origin/main
+
+=== B3 & B4: PYTEST BATCH 01 & BATCH 02 (LIVE OUTPUT) ===
+============================= test session starts ==============================
+platform darwin -- Python 3.15.2, pytest-8.4.2, pluggy-1.7.0 -- /Users/solargaria/All_Projects/goldfish-test-harness/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/solargaria/All_Projects/goldfish-test-harness
+configfile: pyproject.toml
+collecting ... collected 24 items
+
+tests/test_batch_01.py::test_mh_t01_successful_empty_retrieval_is_not_found PASSED [  4%]
+tests/test_batch_01.py::test_mh_t02_timeout_is_retrieval_failed_not_not_found PASSED [  8%]
+tests/test_batch_01.py::test_mh_t03_summary_does_not_claim_transcript_detail PASSED [ 12%]
+tests/test_batch_01.py::test_mh_t04_date_without_time_does_not_invent_time PASSED [ 16%]
+tests/test_batch_01.py::test_mh_t05_incomplete_person_name_remains_ambiguous PASSED [ 20%]
+tests/test_batch_01.py::test_mh_t06_absent_event_is_not_confirmed PASSED [ 25%]
+tests/test_batch_01.py::test_mh_t07_uncertainty_is_preserved PASSED      [ 29%]
+tests/test_batch_01.py::test_mh_t08_negation_is_preserved PASSED         [ 33%]
+tests/test_batch_01.py::test_mh_t09_speaker_attribution_is_preserved PASSED [ 37%]
+tests/test_batch_01.py::test_mh_t10_both_conflicting_dates_are_disclosed PASSED [ 41%]
+tests/test_batch_01.py::test_mr01_rejects_invalid_retrieval_coverage_mapping[reject-not-found-with-partial] PASSED [ 45%]
+tests/test_batch_01.py::test_mr01_rejects_invalid_retrieval_coverage_mapping[reject-failure-with-na] PASSED [ 50%]
+tests/test_batch_01.py::test_batch_01_severity_metadata_matches_golden_suite PASSED [ 54%]
+tests/test_batch_02.py::test_mh_t11_embedded_instruction_remains_untrusted_data PASSED [ 58%]
+tests/test_batch_02.py::test_mh_t12_supported_details_are_separated_from_missing_details PASSED [ 62%]
+tests/test_batch_02.py::test_mh_t13_missing_source_reference_is_disclosed PASSED [ 66%]
+tests/test_batch_02.py::test_mh_t14_current_message_is_not_misattributed_to_memory PASSED [ 70%]
+tests/test_batch_02.py::test_mh_t15_irrelevant_retrieved_record_is_not_used PASSED [ 75%]
+tests/test_batch_02.py::test_mh_t16_explicit_condition_is_preserved PASSED [ 79%]
+tests/test_batch_02.py::test_mh_t17_ambiguous_time_is_not_precisely_invented PASSED [ 83%]
+tests/test_batch_02.py::test_mh_t18_inference_is_not_presented_as_sourced_fact PASSED [ 87%]
+tests/test_batch_02.py::test_mh_t19_retrieval_failure_allows_only_current_message_context PASSED [ 91%]
+tests/test_batch_02.py::test_mh_t20_conflict_remains_unresolved_without_policy PASSED [ 95%]
+tests/test_batch_02.py::test_batch_02_severity_metadata_matches_golden_suite PASSED [100%]
+
+============================== 24 passed in 0.03s ==============================
+
+=== B6 & B7: PRODUCTION POST-STATE (2026-11-25 EVIDENCE) ===
+total 24
+drwxr-xr-x@ 5 solargaria  staff   160 25 Nov 20:43 .
+drwxr-xr-x@ 4 solargaria  staff   128 28 Nov 12:48 ..
+-rw-r--r--@ 1 solargaria  staff  1776 25 Nov 15:19 harness_git.txt
+-rw-r--r--  1 solargaria  staff   399 25 Nov 20:43 production_baseline_post.txt
+-rw-r--r--  1 solargaria  staff   327 25 Nov 15:25 production_git.txt
+--- production_baseline_post.txt ---
+== ประเภท: Baseline หลังภารกิจ (ไม่ใช่ก่อนเริ่ม) ==
+== เวลาบันทึก ==
+2026-11-25 20:43:19 +0700
+== HEAD ==
+2256779432160ec29fcd1ef897eb19b9528336cd
+== จำนวนรายการ status ==
+      48
+== hash ของรายการ status ==
+35e2d0fc4a67a9ad5f6b865b84001d1a59d670fb96ec2bd5e9dd47ef1ed886ee  -
+--- production_git.txt ---
+== toplevel ==
+/Users/solargaria
+== status count ==
+      48
+== remote ==
+origin	https://github.com/solargaria/Goldfish.git (fetch)
+origin	https://github.com/solargaria/Goldfish.git (push)
+== log ==
+2256779 first commit
+958a778 first commit
+== cached diff ==
+== harness commit exists? ==
+fatal: Not a valid object name 75f5f33
